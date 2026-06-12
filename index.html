@@ -1,0 +1,1298 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#0C3327">
+<title>Poker Night — Organise tes soirées</title>
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --felt:#0C3327; --felt-2:#114334; --felt-3:#1A5743;
+  --rail:#2E1F15; --cream:#F5EFE3; --cream-dim:#CFC6B2;
+  --ink:#1B1B17; --chip-red:#C9402F; --chip-blue:#2E5E8C;
+  --brass:#C9A45C; --ok:#7BC47F; --no:#D97A6C; --wait:#E8B84B;
+  --radius:14px; --shadow:0 8px 24px rgba(0,0,0,.35);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  font-family:'Outfit',sans-serif;
+  background:radial-gradient(ellipse at 50% -10%, var(--felt-3) 0%, var(--felt) 55%);
+  color:var(--cream);min-height:100vh;font-size:16px;
+}
+h1,h2,h3,.display{font-family:'Space Grotesk',sans-serif}
+
+header{display:flex;align-items:center;justify-content:space-between;padding:18px 22px;max-width:980px;margin:0 auto;flex-wrap:wrap;gap:10px}
+.logo{display:flex;align-items:center;gap:10px;cursor:pointer}
+.logo .suit{font-size:26px;color:var(--chip-red)}
+.logo h1{font-size:22px;font-weight:700;letter-spacing:.5px}
+nav{display:flex;gap:6px;flex-wrap:wrap}
+nav button{background:transparent;border:1px solid transparent;color:var(--cream-dim);font-family:'Outfit';font-size:15px;font-weight:500;padding:8px 16px;border-radius:99px;cursor:pointer;transition:.15s}
+nav button:hover{color:var(--cream)}
+nav button.active{background:var(--felt-2);color:var(--cream);border-color:rgba(201,164,92,.35)}
+nav button:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid var(--brass);outline-offset:2px}
+
+main{max-width:980px;margin:0 auto;padding:10px 22px 80px}
+
+.btn{font-family:'Outfit';font-weight:600;font-size:15px;border:none;border-radius:10px;padding:11px 18px;cursor:pointer;transition:.15s}
+.btn-primary{background:var(--chip-red);color:#fff}
+.btn-primary:hover{background:#b53827}
+.btn-ghost{background:transparent;color:var(--cream-dim);border:1px solid rgba(245,239,227,.25)}
+.btn-ghost:hover{color:var(--cream);border-color:rgba(245,239,227,.5)}
+.btn-brass{background:var(--brass);color:var(--ink)}
+.btn-brass:hover{background:#b8924a}
+.btn-sm{padding:6px 12px;font-size:13px;border-radius:8px}
+.btn-danger{background:transparent;color:var(--no);border:1px solid rgba(217,122,108,.4)}
+.btn-danger:hover{background:rgba(217,122,108,.12)}
+
+.page-head{display:flex;align-items:baseline;justify-content:space-between;margin:18px 0 20px;flex-wrap:wrap;gap:12px}
+.page-head h2{font-size:32px;font-weight:700}
+.page-head .sub{color:var(--cream-dim);font-size:15px;margin-top:4px}
+
+.event-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:16px}
+.event-card{background:linear-gradient(160deg,var(--felt-2),var(--felt));border:1px solid rgba(201,164,92,.22);border-radius:var(--radius);padding:18px;cursor:pointer;transition:.15s;position:relative;overflow:hidden}
+.event-card:hover{transform:translateY(-2px);border-color:rgba(201,164,92,.5);box-shadow:var(--shadow)}
+.event-card .when{font-size:12px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--brass);margin-bottom:6px}
+.event-card h3{font-size:20px;font-weight:700;margin-bottom:10px}
+.event-card .meta{color:var(--cream-dim);font-size:14px;line-height:1.7}
+.event-card .footer{display:flex;align-items:center;justify-content:space-between;margin-top:14px}
+.seat-count{font-size:14px;color:var(--cream-dim)}
+.seat-count b{color:var(--cream)}
+.event-card.past{opacity:.55}
+.event-card.past:hover{transform:none}
+
+.chip{width:52px;height:52px;border-radius:50%;background:var(--chip-red);border:5px dashed var(--cream);box-shadow:0 3px 0 #8c2c1f,0 5px 10px rgba(0,0,0,.4);display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk';font-weight:700;font-size:13px;color:#fff;flex-shrink:0}
+.chip.blue{background:var(--chip-blue);box-shadow:0 3px 0 #1f4263,0 5px 10px rgba(0,0,0,.4)}
+
+.empty{text-align:center;padding:60px 20px;color:var(--cream-dim);border:1px dashed rgba(245,239,227,.25);border-radius:var(--radius)}
+.empty .suit{font-size:42px;display:block;margin-bottom:12px;color:var(--brass)}
+.empty p{margin-bottom:18px;font-size:16px}
+
+/* table de poker */
+.detail-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin:14px 0 4px;flex-wrap:wrap}
+.detail-head h2{font-size:30px;font-weight:700}
+.detail-meta{color:var(--cream-dim);font-size:15px;line-height:1.8;margin-top:6px}
+.detail-meta b{color:var(--cream);font-weight:600}
+.detail-actions{display:flex;gap:8px;flex-wrap:wrap}
+
+.table-wrap{margin:26px auto 10px;max-width:680px;position:relative}
+.poker-table{position:relative;width:100%;aspect-ratio:2/1.05;background:radial-gradient(ellipse at 50% 40%,var(--felt-3),var(--felt-2) 70%);border-radius:50%/52%;border:14px solid var(--rail);box-shadow:inset 0 0 50px rgba(0,0,0,.45),0 14px 34px rgba(0,0,0,.45)}
+.poker-table::before{content:'';position:absolute;inset:7%;border:2px solid rgba(201,164,92,.3);border-radius:50%/52%}
+.table-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;text-align:center}
+.table-center .pot-label{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--brass)}
+.table-center .pot{font-family:'Space Grotesk';font-size:32px;font-weight:700}
+.table-center .pot-sub{font-size:13px;color:var(--cream-dim)}
+.seat{position:absolute;width:56px;height:56px;margin:-28px 0 0 -28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk';font-weight:700;font-size:17px;transition:.15s}
+.seat .name-tag{position:absolute;top:100%;margin-top:5px;left:50%;transform:translateX(-50%);font-family:'Outfit';font-size:11px;font-weight:500;color:var(--cream-dim);white-space:nowrap;max-width:90px;overflow:hidden;text-overflow:ellipsis}
+.seat.confirmed{background:var(--cream);color:var(--ink);box-shadow:0 3px 8px rgba(0,0,0,.4);border:3px solid var(--ok)}
+.seat.pending{background:rgba(245,239,227,.12);color:var(--cream-dim);border:2px dashed rgba(245,239,227,.5)}
+.seat.free{background:transparent;border:2px dashed rgba(245,239,227,.22);color:rgba(245,239,227,.3)}
+
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:22px;margin-top:28px}
+@media(max-width:760px){.cols{grid-template-columns:1fr}}
+.panel{margin-bottom:8px}
+.panel h3{font-size:13px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--brass);font-family:'Outfit';margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid rgba(201,164,92,.25)}
+.row{display:flex;align-items:center;gap:12px;padding:11px 12px;border-radius:10px;margin-bottom:6px;background:rgba(245,239,227,.05);flex-wrap:wrap}
+.row:hover{background:rgba(245,239,227,.09)}
+.avatar{width:38px;height:38px;border-radius:50%;flex-shrink:0;background:var(--felt-3);border:1px solid rgba(201,164,92,.4);display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk';font-weight:700;font-size:15px;color:var(--brass)}
+.row .info{flex:1;min-width:120px}
+.row .info .nm{font-weight:600;font-size:15px}
+.row .info .ref{font-size:12.5px;color:var(--cream-dim)}
+.badge{font-size:11px;font-weight:600;padding:3px 9px;border-radius:99px;letter-spacing:.3px;display:inline-block}
+.badge.yes{background:rgba(123,196,127,.18);color:var(--ok)}
+.badge.pending{background:rgba(245,239,227,.1);color:var(--cream-dim)}
+.badge.no{background:rgba(217,122,108,.15);color:var(--no)}
+.badge.waitlist{background:rgba(232,184,75,.18);color:var(--wait)}
+.badge.ami{background:rgba(201,164,92,.18);color:var(--brass)}
+.badge.amiami{background:rgba(46,94,140,.3);color:#9FC3E8}
+.badge.guest{background:rgba(159,195,232,.15);color:#9FC3E8}
+.row .acts{display:flex;gap:5px;flex-shrink:0}
+.icon-btn{background:transparent;border:1px solid rgba(245,239,227,.2);color:var(--cream-dim);width:30px;height:30px;border-radius:8px;cursor:pointer;font-size:14px;transition:.15s;display:flex;align-items:center;justify-content:center}
+.icon-btn:hover{color:var(--cream);border-color:rgba(245,239,227,.5)}
+.icon-btn.ok:hover{color:var(--ok);border-color:var(--ok)}
+.icon-btn.ko:hover{color:var(--no);border-color:var(--no)}
+.icon-btn.active-ok{color:var(--ok);border-color:var(--ok);background:rgba(123,196,127,.12)}
+.icon-btn.active-ko{color:var(--no);border-color:var(--no);background:rgba(217,122,108,.12)}
+.hint{font-size:13px;color:var(--cream-dim);padding:8px 2px;line-height:1.6}
+.hint b{color:var(--cream)}
+
+/* paiements */
+.pay-stat{display:flex;gap:18px;flex-wrap:wrap;margin-bottom:12px}
+.pay-stat .box{background:rgba(245,239,227,.06);border:1px solid rgba(245,239,227,.12);border-radius:10px;padding:10px 16px}
+.pay-stat .box .v{font-family:'Space Grotesk';font-size:20px;font-weight:700}
+.pay-stat .box .l{font-size:12px;color:var(--cream-dim)}
+.rebuy-ctl{display:flex;align-items:center;gap:6px}
+.rebuy-ctl .n{font-family:'Space Grotesk';font-weight:700;min-width:18px;text-align:center}
+.pay-toggle{cursor:pointer;font-size:12px;font-weight:600;padding:5px 11px;border-radius:99px;border:1px solid rgba(245,239,227,.25);background:transparent;color:var(--cream-dim)}
+.pay-toggle.paid{background:rgba(123,196,127,.15);color:var(--ok);border-color:rgba(123,196,127,.4)}
+
+/* joueurs */
+.player-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px}
+.player-card{background:rgba(245,239,227,.05);border:1px solid rgba(245,239,227,.12);border-radius:var(--radius);padding:14px;display:flex;gap:12px;align-items:center}
+.player-card .info{flex:1;min-width:0}
+.player-card .nm{font-weight:600;font-size:16px}
+.player-card .ref{font-size:13px;color:var(--cream-dim);margin-top:2px;line-height:1.5}
+.fiab{font-size:12px;font-weight:600}
+.fiab.good{color:var(--ok)} .fiab.mid{color:var(--wait)} .fiab.bad{color:var(--no)}
+
+/* classement */
+.lb-table{width:100%;border-collapse:collapse;font-size:15px}
+.lb-table th{font-size:12px;letter-spacing:1.5px;text-transform:uppercase;color:var(--brass);text-align:left;padding:10px 12px;border-bottom:1px solid rgba(201,164,92,.3)}
+.lb-table td{padding:12px;border-bottom:1px solid rgba(245,239,227,.08)}
+.lb-table tr:hover td{background:rgba(245,239,227,.04)}
+.lb-rank{font-family:'Space Grotesk';font-weight:700;font-size:18px;color:var(--brass)}
+.net-pos{color:var(--ok);font-weight:600} .net-neg{color:var(--no);font-weight:600}
+
+/* modales */
+.overlay{position:fixed;inset:0;background:rgba(8,26,20,.78);backdrop-filter:blur(3px);display:none;align-items:flex-start;justify-content:center;z-index:50;padding:40px 16px;overflow-y:auto}
+.overlay.open{display:flex}
+.modal{background:var(--felt-2);border:1px solid rgba(201,164,92,.3);border-radius:16px;padding:26px;width:100%;max-width:500px;box-shadow:var(--shadow)}
+.modal h3{font-size:23px;font-weight:700;margin-bottom:20px}
+.field{margin-bottom:14px}
+.field label{display:block;font-size:13px;font-weight:600;color:var(--cream-dim);margin-bottom:6px}
+.field input,.field select,.field textarea{width:100%;background:rgba(12,51,39,.7);border:1px solid rgba(245,239,227,.2);border-radius:10px;padding:11px 13px;color:var(--cream);font-family:'Outfit';font-size:15px}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--brass)}
+.field textarea{resize:vertical;min-height:70px}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.modal-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:22px;flex-wrap:wrap}
+.modal-actions .left{margin-right:auto}
+.invite-box{background:rgba(12,51,39,.7);border:1px solid rgba(245,239,227,.2);border-radius:10px;padding:14px;font-size:14px;line-height:1.7;white-space:pre-wrap;color:var(--cream-dim);max-height:280px;overflow-y:auto}
+
+/* résultats */
+.res-row{display:grid;grid-template-columns:1fr 70px 95px;gap:10px;align-items:center;margin-bottom:8px}
+.res-row input{background:rgba(12,51,39,.7);border:1px solid rgba(245,239,227,.2);border-radius:8px;padding:8px 10px;color:var(--cream);font-family:'Outfit';font-size:14px;width:100%}
+.res-head{display:grid;grid-template-columns:1fr 70px 95px;gap:10px;font-size:11px;letter-spacing:1px;text-transform:uppercase;color:var(--brass);margin-bottom:8px}
+
+/* timer */
+#timer-overlay{position:fixed;inset:0;background:radial-gradient(ellipse at 50% 30%,var(--felt-3),var(--felt) 75%);z-index:100;display:none;flex-direction:column;align-items:center;justify-content:center;gap:18px;text-align:center;padding:20px}
+#timer-overlay.open{display:flex}
+.t-level{font-size:14px;letter-spacing:3px;text-transform:uppercase;color:var(--brass);font-weight:600}
+.t-clock{font-family:'Space Grotesk';font-size:clamp(72px,18vw,160px);font-weight:700;line-height:1;font-variant-numeric:tabular-nums}
+.t-blinds{font-family:'Space Grotesk';font-size:clamp(26px,6vw,44px);font-weight:700;color:var(--cream)}
+.t-next{font-size:15px;color:var(--cream-dim)}
+.t-ctl{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:8px}
+.t-cfg{display:flex;gap:10px;align-items:center;color:var(--cream-dim);font-size:14px}
+.t-cfg input{width:64px;background:rgba(12,51,39,.7);border:1px solid rgba(245,239,227,.25);border-radius:8px;padding:7px;color:var(--cream);text-align:center;font-family:'Space Grotesk';font-weight:700}
+#timer-close{position:absolute;top:18px;right:20px}
+.t-warning{color:var(--wait)}
+
+/* items "qui amène quoi" */
+.item-add{display:flex;gap:8px;margin-bottom:10px}
+.item-add input{flex:1;background:rgba(12,51,39,.7);border:1px solid rgba(245,239,227,.2);border-radius:10px;padding:9px 12px;color:var(--cream);font-family:'Outfit';font-size:14px}
+.row select.assign{background:rgba(12,51,39,.7);border:1px solid rgba(245,239,227,.2);border-radius:8px;padding:6px 8px;color:var(--cream);font-family:'Outfit';font-size:13px;max-width:150px}
+
+/* RSVP public */
+.rsvp-card{max-width:480px;margin:30px auto;background:linear-gradient(160deg,var(--felt-2),var(--felt));border:1px solid rgba(201,164,92,.3);border-radius:16px;padding:28px;box-shadow:var(--shadow)}
+.rsvp-card h2{font-size:26px;margin-bottom:14px}
+.rsvp-yesno{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px}
+
+#toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--cream);color:var(--ink);font-weight:600;font-size:14px;padding:11px 22px;border-radius:99px;box-shadow:var(--shadow);opacity:0;pointer-events:none;transition:.25s;z-index:200}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+@media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+@media(max-width:600px){
+  header{padding:14px} main{padding:6px 14px 70px}
+  .page-head h2{font-size:24px} .detail-head h2{font-size:22px}
+  .table-center .pot{font-size:22px}
+  .seat{width:44px;height:44px;margin:-22px 0 0 -22px;font-size:14px}
+  .seat .name-tag{display:none}
+  .res-row,.res-head{grid-template-columns:1fr 56px 80px}
+}
+</style>
+</head>
+<body>
+
+<header id="app-header">
+  <div class="logo" onclick="go('dashboard')">
+    <span class="suit">♠</span><h1>Poker Night</h1>
+  </div>
+  <nav>
+    <button id="nav-dashboard" onclick="go('dashboard')">Soirées</button>
+    <button id="nav-players" onclick="go('players')">Joueurs</button>
+    <button id="nav-leaderboard" onclick="go('leaderboard')">Classement</button>
+  </nav>
+</header>
+
+<main id="app"></main>
+
+<!-- Modale soirée -->
+<div class="overlay" id="ov-event">
+  <div class="modal">
+    <h3 id="ev-modal-title">Nouvelle soirée</h3>
+    <div class="field"><label for="ev-title">Nom de la soirée</label>
+      <input id="ev-title" placeholder="Texas Hold'em chez Paul"></div>
+    <div class="field-row">
+      <div class="field"><label for="ev-date">Date</label><input id="ev-date" type="date"></div>
+      <div class="field"><label for="ev-time">Heure</label><input id="ev-time" type="time" value="20:00"></div>
+    </div>
+    <div class="field"><label for="ev-place">Lieu</label>
+      <input id="ev-place" placeholder="12 rue de la Gare, Bettembourg"></div>
+    <div class="field-row">
+      <div class="field"><label for="ev-buyin">Buy-in (€)</label><input id="ev-buyin" type="number" min="0" step="5" value="20"></div>
+      <div class="field"><label for="ev-seats">Places à table</label><input id="ev-seats" type="number" min="2" max="10" value="8"></div>
+    </div>
+    <div class="field"><label for="ev-pass">Mot de passe de la table (optionnel)</label>
+      <input id="ev-pass" placeholder="Requis pour s'inscrire via le lien" autocomplete="off"></div>
+    <div class="field"><label for="ev-notes">Notes (variante, re-buy, snacks…)</label>
+      <textarea id="ev-notes" placeholder="Re-buy autorisé jusqu'à 22h."></textarea></div>
+    <div class="modal-actions">
+      <button class="btn btn-danger left" id="ev-delete" style="display:none" onclick="deleteEvent()">Supprimer</button>
+      <button class="btn btn-ghost" onclick="closeModal('ov-event')">Annuler</button>
+      <button class="btn btn-primary" onclick="saveEvent()">Enregistrer</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modale joueur -->
+<div class="overlay" id="ov-player">
+  <div class="modal">
+    <h3 id="pl-modal-title">Nouveau joueur</h3>
+    <div class="field"><label for="pl-name">Nom</label><input id="pl-name" placeholder="Marc"></div>
+    <div class="field"><label for="pl-phone">Téléphone (optionnel)</label><input id="pl-phone" placeholder="+352 …"></div>
+    <div class="field"><label for="pl-type">Cercle</label>
+      <select id="pl-type" onchange="toggleRefField()">
+        <option value="ami">Ami direct</option>
+        <option value="ami_ami">Ami d'un ami</option>
+      </select></div>
+    <div class="field" id="pl-ref-field" style="display:none">
+      <label for="pl-ref">Recommandé par</label><select id="pl-ref"></select></div>
+    <div class="modal-actions">
+      <button class="btn btn-danger left" id="pl-delete" style="display:none" onclick="deletePlayer()">Supprimer</button>
+      <button class="btn btn-ghost" onclick="closeModal('ov-player')">Annuler</button>
+      <button class="btn btn-primary" onclick="savePlayer()">Enregistrer</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modale invitation -->
+<div class="overlay" id="ov-invite">
+  <div class="modal">
+    <h3>Message d'invitation</h3>
+    <div class="invite-box" id="invite-text"></div>
+    <div class="modal-actions" style="flex-wrap:wrap">
+      <button class="btn btn-ghost" onclick="closeModal('ov-invite')">Fermer</button>
+      <button class="btn btn-ghost" onclick="sendInviteEmail()">📧 Email</button>
+      <button class="btn btn-primary" onclick="sendInviteWhatsApp()">WhatsApp</button>
+      <button class="btn btn-brass" onclick="copyInvite()">Copier</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modale résultats -->
+<div class="overlay" id="ov-results">
+  <div class="modal">
+    <h3>Résultats de la soirée</h3>
+    <p class="hint" style="margin-bottom:14px">Classement final et gains/pertes nets de chacun (négatif = perte). Ça alimente le classement de la saison.</p>
+    <div class="res-head"><span>Joueur</span><span>Place</span><span>Net (€)</span></div>
+    <div id="res-rows"></div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('ov-results')">Annuler</button>
+      <button class="btn btn-primary" onclick="saveResults()">Enregistrer</button>
+    </div>
+  </div>
+</div>
+
+<!-- Timer de tournoi -->
+<div id="timer-overlay">
+  <button class="btn btn-ghost btn-sm" id="timer-close" onclick="closeTimer()">✕ Fermer</button>
+  <div class="t-level" id="t-level">Niveau 1</div>
+  <div class="t-clock" id="t-clock">15:00</div>
+  <div class="t-blinds" id="t-blinds">25 / 50</div>
+  <div class="t-next" id="t-next">Niveau suivant : 50 / 100</div>
+  <div class="t-ctl">
+    <button class="btn btn-ghost" onclick="timerPrev()">⏮ Précédent</button>
+    <button class="btn btn-brass" id="t-playpause" onclick="timerToggle()">▶ Démarrer</button>
+    <button class="btn btn-ghost" onclick="timerNext()">Suivant ⏭</button>
+  </div>
+  <div class="t-cfg">
+    <label for="t-min">Minutes par niveau</label>
+    <input id="t-min" type="number" min="3" max="60" value="15" onchange="timerSetDuration()">
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+/* =====================================================
+   CONFIGURATION FIREBASE (optionnelle)
+   Pour activer la synchro multi-appareils + le RSVP par
+   lien : colle ici la config de ton projet Firebase
+   (console.firebase.google.com → paramètres du projet).
+   Laisse à null pour rester en localStorage pur.
+===================================================== */
+var FIREBASE_CONFIG = {
+  apiKey: "AIzaSyDiR814zqOr8KU-z06lXATt68fpX357kMk",
+  authDomain: "poker-night-pj.firebaseapp.com",
+  projectId: "poker-night-pj",
+  storageBucket: "poker-night-pj.firebasestorage.app",
+  messagingSenderId: "311983889104",
+  appId: "1:311983889104:web:14f765eeeffbb161ba9cd5"
+};
+/* Exemple :
+var FIREBASE_CONFIG = {
+  apiKey: "…", authDomain: "…", projectId: "…",
+  storageBucket: "…", messagingSenderId: "…", appId: "…"
+};
+*/
+
+var DB_KEY = 'pokernight_v2';
+var CLIENT_ID = (function(){
+  var c = localStorage.getItem('pokernight_client');
+  if(!c){ c = Math.random().toString(36).slice(2); localStorage.setItem('pokernight_client', c); }
+  return c;
+})();
+var fs = null; /* Firestore handle */
+
+/* ---------- données ---------- */
+function migrate(d){
+  d = d || {};
+  d.players = d.players || [];
+  d.events = d.events || [];
+  d.events.forEach(function(e){
+    e.invites = e.invites || [];
+    e.invites.forEach(function(i){
+      if(i.paid === undefined) i.paid = false;
+      if(i.rebuys === undefined) i.rebuys = 0;
+      if(i.attended === undefined) i.attended = null;
+      if(!i.id) i.id = uid();
+    });
+    e.items = e.items || [];
+    e.results = e.results || null;
+    e.levelMin = e.levelMin || 15;
+    if(e.pass === undefined) e.pass = '';
+  });
+  return d;
+}
+function loadDB(){
+  try{
+    var raw = localStorage.getItem(DB_KEY) || localStorage.getItem('pokernight_v1');
+    if(raw) return migrate(JSON.parse(raw));
+  }catch(e){}
+  return migrate({});
+}
+function saveDB(){
+  localStorage.setItem(DB_KEY, JSON.stringify(db));
+  if(fs){
+    fs.collection('pokernight').doc('state')
+      .set({ db: db, _client: CLIENT_ID, updatedAt: Date.now() })
+      .catch(function(e){ console.warn('Sync Firestore échouée', e); });
+  }
+}
+function uid(){ return Date.now().toString(36) + Math.random().toString(36).slice(2,7); }
+
+var db = loadDB();
+var view = { page:'dashboard', eventId:null };
+var editingEventId = null, editingPlayerId = null, resultsEventId = null;
+var inviteMessage = '';
+
+/* ---------- Firebase init (compat SDK, chargé seulement si configuré) ---------- */
+function initFirebase(){
+  if(!FIREBASE_CONFIG) return;
+  var s1 = document.createElement('script');
+  s1.src = 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js';
+  s1.onload = function(){
+    var s2 = document.createElement('script');
+    s2.src = 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js';
+    s2.onload = function(){
+      firebase.initializeApp(FIREBASE_CONFIG);
+      fs = firebase.firestore();
+      render(); /* re-render maintenant que fs est dispo (bouton RSVP, etc.) */
+      fs.collection('pokernight').doc('state').onSnapshot(function(doc){
+        if(doc.exists){
+          var data = doc.data();
+          if(data._client !== CLIENT_ID && data.db){
+            db = migrate(data.db);
+            localStorage.setItem(DB_KEY, JSON.stringify(db));
+            render();
+          }
+        } else {
+          saveDB(); /* premier push */
+        }
+      });
+    };
+    document.head.appendChild(s2);
+  };
+  document.head.appendChild(s1);
+}
+
+/* ---------- helpers ---------- */
+function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
+function getPlayer(id){return db.players.find(function(p){return p.id===id})}
+function getEvent(id){return db.events.find(function(e){return e.id===id})}
+function getInvite(ev,invId){return ev.invites.find(function(i){return i.id===invId})}
+function invName(inv){var p=inv.playerId?getPlayer(inv.playerId):null;return p?p.name:(inv.guestName||'?')}
+function initial(name){return (name||'?').trim().charAt(0).toUpperCase()}
+function fmtDate(iso,time){
+  if(!iso) return 'Date à définir';
+  var d=new Date(iso+'T'+(time||'20:00'));
+  var s=d.toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'});
+  return s.charAt(0).toUpperCase()+s.slice(1)+(time?' · '+time:'');
+}
+function isPast(ev){
+  if(!ev.date) return false;
+  return new Date(ev.date+'T'+(ev.time||'23:59')) < new Date(Date.now()-6*3600*1000);
+}
+function confirmed(ev){return ev.invites.filter(function(i){return i.status==='yes'})}
+function waitlist(ev){return ev.invites.filter(function(i){return i.status==='waitlist'})}
+function toast(msg){
+  var t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');
+  clearTimeout(t._h);t._h=setTimeout(function(){t.classList.remove('show')},2400);
+}
+function openModal(id){document.getElementById(id).classList.add('open')}
+function closeModal(id){document.getElementById(id).classList.remove('open')}
+function go(page,eventId){view.page=page;view.eventId=eventId||null;render();window.scrollTo(0,0)}
+
+/* =====================================================
+   RENDER
+===================================================== */
+function render(){
+  ['dashboard','players','leaderboard'].forEach(function(p){
+    var b=document.getElementById('nav-'+p);
+    if(b) b.className = (view.page===p || (p==='dashboard'&&view.page==='event')) ? 'active' : '';
+  });
+  var app=document.getElementById('app');
+  if(view.page==='players') app.innerHTML=renderPlayers();
+  else if(view.page==='leaderboard') app.innerHTML=renderLeaderboard();
+  else if(view.page==='event') app.innerHTML=renderEventDetail();
+  else app.innerHTML=renderDashboard();
+}
+
+/* ---------- Dashboard ---------- */
+function renderDashboard(){
+  var upcoming=db.events.filter(function(e){return !isPast(e)}).sort(function(a,b){return (a.date||'9999')<(b.date||'9999')?-1:1});
+  var past=db.events.filter(isPast).sort(function(a,b){return a.date<b.date?1:-1});
+  var h='<div class="page-head"><div><h2>Tes soirées</h2>'+
+    '<div class="sub">'+db.events.length+' soirée'+(db.events.length>1?'s':'')+' · '+db.players.length+' joueur'+(db.players.length>1?'s':'')+' au carnet</div></div>'+
+    '<button class="btn btn-primary" onclick="openEventModal()">♠ Nouvelle soirée</button></div>';
+  if(!db.events.length){
+    return h+'<div class="empty"><span class="suit">♣</span><p>Aucune soirée pour l\'instant.<br>Crée la première et distribue les cartes.</p>'+
+      '<button class="btn btn-primary" onclick="openEventModal()">Créer une soirée</button></div>';
+  }
+  if(upcoming.length) h+='<div class="event-grid">'+upcoming.map(eventCard).join('')+'</div>';
+  else h+='<div class="empty"><span class="suit">♦</span><p>Rien de prévu prochainement.</p><button class="btn btn-primary" onclick="openEventModal()">Créer une soirée</button></div>';
+  if(past.length){
+    h+='<div class="page-head" style="margin-top:36px"><h2 style="font-size:22px">Soirées passées</h2></div>'+
+      '<div class="event-grid">'+past.map(eventCard).join('')+'</div>';
+  }
+  return h;
+}
+function eventCard(ev){
+  var conf=confirmed(ev).length;
+  return '<div class="event-card'+(isPast(ev)?' past':'')+'" onclick="go(\'event\',\''+ev.id+'\')">'+
+    '<div class="when">'+esc(fmtDate(ev.date,ev.time))+'</div>'+
+    '<h3>'+esc(ev.title||'Soirée poker')+'</h3>'+
+    '<div class="meta">📍 '+esc(ev.place||'Lieu à définir')+(ev.results?'<br>🏆 Résultats enregistrés':'')+'</div>'+
+    '<div class="footer"><span class="seat-count"><b>'+conf+'</b> / '+ev.seats+' confirmés'+
+    (waitlist(ev).length?' · '+waitlist(ev).length+' en attente':'')+'</span>'+
+    '<div class="chip'+(ev.buyin>=50?' blue':'')+'">'+ev.buyin+'€</div></div></div>';
+}
+
+/* ---------- Détail soirée ---------- */
+function renderEventDetail(){
+  var ev=getEvent(view.eventId);
+  if(!ev){view.page='dashboard';return renderDashboard()}
+  var conf=confirmed(ev), pend=ev.invites.filter(function(i){return i.status==='pending'});
+  var wl=waitlist(ev), past=isPast(ev);
+  var pot=conf.length*(ev.buyin||0);
+  var rebuysTotal=ev.invites.reduce(function(a,i){return a+(i.rebuys||0)},0);
+  var potReel=pot+rebuysTotal*(ev.buyin||0);
+  var encaisse=ev.invites.reduce(function(a,i){
+    return a+((i.status==='yes'&&i.paid)?(ev.buyin||0):0)+(i.rebuys||0)*(ev.buyin||0);
+  },0);
+
+  var h='<button class="btn btn-ghost btn-sm" onclick="go(\'dashboard\')">← Retour</button>';
+  h+='<div class="detail-head"><div><h2>'+esc(ev.title||'Soirée poker')+'</h2>'+
+    '<div class="detail-meta">🗓 <b>'+esc(fmtDate(ev.date,ev.time))+'</b><br>📍 '+esc(ev.place||'Lieu à définir')+
+    '<br>💰 Buy-in <b>'+ev.buyin+' €</b> · '+ev.seats+' places'+
+    (ev.pass?'<br>🔑 Mot de passe table : <b>'+esc(ev.pass)+'</b>':'')+
+    (ev.notes?'<br>📝 '+esc(ev.notes):'')+'</div></div>'+
+    '<div class="detail-actions">'+
+      '<button class="btn btn-brass" onclick="showInvite(\''+ev.id+'\')">Invitation</button>'+
+      '<button class="btn btn-primary" onclick="openTimer(\''+ev.id+'\')">♠ Timer blinds</button>'+
+      '<button class="btn btn-ghost" onclick="addToGoogleCalendar(\''+ev.id+'\')">📅 Google Agenda</button>'+
+      '<button class="btn btn-ghost" onclick="downloadICS(\''+ev.id+'\')">⬇ .ics</button>'+
+      '<button class="btn btn-ghost" onclick="duplicateEvent(\''+ev.id+'\')">Dupliquer</button>'+
+      (fs?'<button class="btn btn-ghost" onclick="copyRsvpLink(\''+ev.id+'\')">🔗 Lien RSVP</button>':'')+
+      '<button class="btn btn-ghost" onclick="openEventModal(\''+ev.id+'\')">Modifier</button>'+
+      '<button class="btn btn-ghost" onclick="openResults(\''+ev.id+'\')">🏆 Résultats</button>'+
+    '</div></div>';
+
+  /* table */
+  h+='<div class="table-wrap"><div class="poker-table"><div class="table-center">'+
+    '<div class="pot-label">Pot de départ</div><div class="pot">'+potReel+' €</div>'+
+    '<div class="pot-sub">'+conf.length+' × '+ev.buyin+' €'+(rebuysTotal?' + '+rebuysTotal+' re-buy'+(rebuysTotal>1?'s':''):'')+'</div>'+
+    '</div>'+renderSeats(ev,conf,pend)+'</div></div>';
+
+  h+='<div class="cols">';
+
+  /* --- invités --- */
+  h+='<div class="panel"><h3>Invités ('+ev.invites.length+')</h3>';
+  if(!ev.invites.length) h+='<div class="hint">Personne n\'est encore invité. Pioche dans les suggestions.</div>';
+  ev.invites.forEach(function(inv){
+    var nm=invName(inv);
+    var badge=inv.status==='yes'?'<span class="badge yes">Confirmé</span>'
+      :inv.status==='no'?'<span class="badge no">Refusé</span>'
+      :inv.status==='waitlist'?'<span class="badge waitlist">Liste d\'attente</span>'
+      :'<span class="badge pending">En attente</span>';
+    var guest=!inv.playerId?' <span class="badge guest">via RSVP</span>':'';
+    var attendBtns='';
+    if(past && inv.status==='yes'){
+      attendBtns='<button class="icon-btn'+(inv.attended===true?' active-ok':'')+'" title="Était présent" aria-label="Présent" onclick="setAttended(\''+ev.id+'\',\''+inv.id+'\',true)">👤</button>'+
+        '<button class="icon-btn'+(inv.attended===false?' active-ko':'')+'" title="No-show" aria-label="Absent" onclick="setAttended(\''+ev.id+'\',\''+inv.id+'\',false)">🚫</button>';
+    }
+    h+='<div class="row"><div class="avatar">'+esc(initial(nm))+'</div>'+
+      '<div class="info"><div class="nm">'+esc(nm)+guest+'</div>'+
+      '<div class="ref">'+(inv.playerId?refLabel(getPlayer(inv.playerId)):'Inscription par lien')+'</div></div>'+badge+
+      '<div class="acts">'+attendBtns+
+        (inv.status!=='yes'?'<button class="icon-btn ok" title="Confirmer" aria-label="Confirmer '+esc(nm)+'" onclick="setStatus(\''+ev.id+'\',\''+inv.id+'\',\'yes\')">✓</button>':'')+
+        (inv.status!=='no'?'<button class="icon-btn ko" title="Refuser" aria-label="Marquer refusé" onclick="setStatus(\''+ev.id+'\',\''+inv.id+'\',\'no\')">✕</button>':'')+
+        (!inv.playerId?'<button class="icon-btn" title="Ajouter au carnet" aria-label="Ajouter au carnet" onclick="guestToPlayer(\''+ev.id+'\',\''+inv.id+'\')">＋</button>':'')+
+        '<button class="icon-btn" title="Retirer" aria-label="Retirer" onclick="uninvite(\''+ev.id+'\',\''+inv.id+'\')">🗑</button>'+
+      '</div></div>';
+  });
+  h+='</div>';
+
+  /* --- suggestions --- */
+  var invitedIds=ev.invites.map(function(i){return i.playerId}).filter(Boolean);
+  var suggestions=db.players.filter(function(p){return invitedIds.indexOf(p.id)===-1});
+  suggestions.sort(function(a,b){
+    if(a.type!==b.type) return a.type==='ami'?-1:1;
+    var fa=fiabilite(a),fb=fiabilite(b);
+    if(fa!==fb) return (fb===null?-1:fb)-(fa===null?-1:fa);
+    return a.name.localeCompare(b.name);
+  });
+  var freeSeats=ev.seats-conf.length;
+  h+='<div class="panel"><h3>Joueurs potentiels ('+suggestions.length+')</h3>';
+  if(freeSeats>0&&suggestions.length) h+='<div class="hint">Encore <b>'+freeSeats+'</b> place'+(freeSeats>1?'s':'')+'. Triés par cercle puis fiabilité.</div>';
+  if(!db.players.length) h+='<div class="hint">Ton carnet est vide. <a href="#" style="color:var(--brass)" onclick="go(\'players\');return false">Ajoute des joueurs</a>.</div>';
+  else if(!suggestions.length) h+='<div class="hint">Tout le carnet est déjà invité.</div>';
+  suggestions.forEach(function(p){
+    var f=fiabilite(p);
+    h+='<div class="row"><div class="avatar">'+esc(initial(p.name))+'</div>'+
+      '<div class="info"><div class="nm">'+esc(p.name)+' '+
+      (p.type==='ami'?'<span class="badge ami">Ami</span>':'<span class="badge amiami">Ami d\'ami</span>')+'</div>'+
+      '<div class="ref">'+refLabel(p)+(f!==null?' · '+fiabHtml(f):'')+'</div></div>'+
+      '<button class="btn btn-sm btn-primary" onclick="invite(\''+ev.id+'\',\''+p.id+'\')">Inviter</button></div>';
+  });
+  h+='</div></div>';
+
+  /* --- paiements --- */
+  if(conf.length){
+    h+='<div class="panel" style="margin-top:26px"><h3>Buy-ins &amp; re-buys</h3>'+
+      '<div class="pay-stat">'+
+        '<div class="box"><div class="v">'+encaisse+' €</div><div class="l">Encaissé</div></div>'+
+        '<div class="box"><div class="v">'+potReel+' €</div><div class="l">Attendu (pot réel)</div></div>'+
+        '<div class="box"><div class="v">'+rebuysTotal+'</div><div class="l">Re-buys</div></div>'+
+      '</div>';
+    conf.forEach(function(inv){
+      var nm=invName(inv);
+      h+='<div class="row"><div class="avatar">'+esc(initial(nm))+'</div>'+
+        '<div class="info"><div class="nm">'+esc(nm)+'</div></div>'+
+        '<button class="pay-toggle'+(inv.paid?' paid':'')+'" onclick="togglePaid(\''+ev.id+'\',\''+inv.id+'\')">'+(inv.paid?'✓ Payé':'Buy-in dû')+'</button>'+
+        '<div class="rebuy-ctl"><span style="font-size:12px;color:var(--cream-dim)">Re-buy</span>'+
+          '<button class="icon-btn" aria-label="Retirer un re-buy" onclick="rebuy(\''+ev.id+'\',\''+inv.id+'\',-1)">−</button>'+
+          '<span class="n">'+(inv.rebuys||0)+'</span>'+
+          '<button class="icon-btn" aria-label="Ajouter un re-buy" onclick="rebuy(\''+ev.id+'\',\''+inv.id+'\',1)">＋</button>'+
+        '</div></div>';
+    });
+    h+='</div>';
+  }
+
+  /* --- qui amène quoi --- */
+  h+='<div class="panel" style="margin-top:26px"><h3>Qui amène quoi</h3>'+
+    '<div class="item-add"><input id="item-label" placeholder="Bières, chips, jetons supplémentaires…" onkeydown="if(event.key===\'Enter\')addItem(\''+ev.id+'\')">'+
+    '<button class="btn btn-sm btn-brass" onclick="addItem(\''+ev.id+'\')">Ajouter</button></div>';
+  if(!ev.items.length) h+='<div class="hint">Rien sur la liste. Ajoute ce qu\'il faut pour la soirée et assigne un joueur.</div>';
+  ev.items.forEach(function(it){
+    var opts='<option value="">— À pourvoir —</option>'+conf.map(function(inv){
+      return '<option value="'+inv.id+'"'+(it.invId===inv.id?' selected':'')+'>'+esc(invName(inv))+'</option>';
+    }).join('');
+    h+='<div class="row"><div class="info"><div class="nm">'+esc(it.label)+'</div></div>'+
+      '<select class="assign" aria-label="Assigner" onchange="assignItem(\''+ev.id+'\',\''+it.id+'\',this.value)">'+opts+'</select>'+
+      '<button class="icon-btn" aria-label="Supprimer" onclick="removeItem(\''+ev.id+'\',\''+it.id+'\')">🗑</button></div>';
+  });
+  h+='</div>';
+
+  /* --- résultats enregistrés --- */
+  if(ev.results&&ev.results.length){
+    h+='<div class="panel" style="margin-top:26px"><h3>Résultats</h3>';
+    ev.results.slice().sort(function(a,b){return a.rank-b.rank}).forEach(function(r){
+      h+='<div class="row"><span class="lb-rank" style="width:30px">'+r.rank+'</span>'+
+        '<div class="info"><div class="nm">'+esc(r.name)+(r.rank===1?' 🏆':'')+'</div></div>'+
+        '<span class="'+(r.net>=0?'net-pos':'net-neg')+'">'+(r.net>=0?'+':'')+r.net+' €</span></div>';
+    });
+    h+='</div>';
+  }
+  return h;
+}
+
+function refLabel(p){
+  if(!p) return '';
+  if(p.type==='ami_ami'){
+    var ref=getPlayer(p.refBy);
+    return 'Via '+esc(ref?ref.name:(p.refByName||'un ami'));
+  }
+  return p.phone?esc(p.phone):'Cercle proche';
+}
+function renderSeats(ev,conf,pend){
+  var seats=Math.min(Math.max(ev.seats||8,2),10), html='';
+  var occupants=conf.concat(pend).slice(0,seats);
+  for(var i=0;i<seats;i++){
+    var angle=(Math.PI*2*i/seats)-Math.PI/2;
+    var x=50+46*Math.cos(angle), y=50+47*Math.sin(angle);
+    var inv=occupants[i];
+    if(inv){
+      var nm=invName(inv), cls=inv.status==='yes'?'confirmed':'pending';
+      html+='<div class="seat '+cls+'" style="left:'+x+'%;top:'+y+'%" title="'+esc(nm)+(inv.status==='yes'?' (confirmé)':' (en attente)')+'">'+
+        esc(initial(nm))+'<span class="name-tag">'+esc(nm)+'</span></div>';
+    } else {
+      html+='<div class="seat free" style="left:'+x+'%;top:'+y+'%" title="Place libre">+</div>';
+    }
+  }
+  return html;
+}
+
+/* ---------- Joueurs + fiabilité ---------- */
+function fiabilite(p){
+  var present=0,noshow=0;
+  db.events.forEach(function(e){
+    if(!isPast(e)) return;
+    e.invites.forEach(function(i){
+      if(i.playerId!==p.id||i.status!=='yes') return;
+      if(i.attended===true) present++;
+      if(i.attended===false) noshow++;
+    });
+  });
+  var total=present+noshow;
+  return total?Math.round(100*present/total):null;
+}
+function fiabHtml(f){
+  var cls=f>=80?'good':f>=50?'mid':'bad';
+  return '<span class="fiab '+cls+'">fiabilité '+f+'%</span>';
+}
+function renderPlayers(){
+  var amis=db.players.filter(function(p){return p.type==='ami'});
+  var amisamis=db.players.filter(function(p){return p.type==='ami_ami'});
+  var h='<div class="page-head"><div><h2>Carnet de joueurs</h2>'+
+    '<div class="sub">'+amis.length+' amis · '+amisamis.length+' amis d\'amis</div></div>'+
+    '<button class="btn btn-primary" onclick="openPlayerModal()">+ Ajouter un joueur</button></div>';
+  if(!db.players.length){
+    return h+'<div class="empty"><span class="suit">♥</span><p>Ton carnet est vide.<br>Ajoute tes amis, puis leurs amis : c\'est eux qui rempliront tes tables.</p>'+
+      '<button class="btn btn-primary" onclick="openPlayerModal()">Ajouter un joueur</button></div>';
+  }
+  function card(p){
+    var played=db.events.filter(function(e){
+      return e.invites.some(function(i){return i.playerId===p.id&&i.status==='yes'});
+    }).length;
+    var f=fiabilite(p);
+    return '<div class="player-card"><div class="avatar">'+esc(initial(p.name))+'</div>'+
+      '<div class="info"><div class="nm">'+esc(p.name)+'</div>'+
+      '<div class="ref">'+refLabel(p)+' · '+played+' soirée'+(played>1?'s':'')+
+      (f!==null?'<br>'+fiabHtml(f):'')+'</div></div>'+
+      '<button class="btn btn-ghost btn-sm" onclick="openPlayerModal(\''+p.id+'\')">Modifier</button></div>';
+  }
+  if(amis.length) h+='<div class="panel" style="margin-bottom:24px"><h3>Amis directs</h3><div class="player-grid">'+amis.map(card).join('')+'</div></div>';
+  if(amisamis.length) h+='<div class="panel"><h3>Amis d\'amis — les joueurs potentiels</h3><div class="player-grid">'+amisamis.map(card).join('')+'</div></div>';
+  return h;
+}
+
+/* ---------- Classement saison ---------- */
+function renderLeaderboard(){
+  var agg={};
+  db.events.forEach(function(e){
+    if(!e.results) return;
+    e.results.forEach(function(r){
+      var key=r.playerId||('guest:'+r.name);
+      if(!agg[key]) agg[key]={name:r.name,playerId:r.playerId,net:0,wins:0,games:0,best:99};
+      agg[key].net+=r.net; agg[key].games++;
+      if(r.rank===1) agg[key].wins++;
+      if(r.rank<agg[key].best) agg[key].best=r.rank;
+    });
+  });
+  var list=Object.keys(agg).map(function(k){return agg[k]});
+  list.sort(function(a,b){return b.net-a.net});
+  var h='<div class="page-head"><div><h2>Classement de la saison</h2>'+
+    '<div class="sub">Basé sur les résultats enregistrés ('+db.events.filter(function(e){return e.results}).length+' soirée'+(db.events.filter(function(e){return e.results}).length>1?'s':'')+')</div></div></div>';
+  if(!list.length){
+    return h+'<div class="empty"><span class="suit">♦</span><p>Aucun résultat enregistré.<br>Après une soirée, ouvre-la et clique sur « 🏆 Résultats ».</p></div>';
+  }
+  h+='<table class="lb-table"><thead><tr><th></th><th>Joueur</th><th>Net</th><th>Victoires</th><th>Soirées</th><th>Meilleure place</th></tr></thead><tbody>';
+  list.forEach(function(r,i){
+    h+='<tr><td class="lb-rank">'+(i+1)+(i===0?' 🏆':'')+'</td><td>'+esc(r.name)+'</td>'+
+      '<td class="'+(r.net>=0?'net-pos':'net-neg')+'">'+(r.net>=0?'+':'')+r.net+' €</td>'+
+      '<td>'+r.wins+'</td><td>'+r.games+'</td><td>'+(r.best===99?'—':r.best)+'</td></tr>';
+  });
+  h+='</tbody></table>';
+  return h;
+}
+
+/* =====================================================
+   ACTIONS — soirées
+===================================================== */
+function openEventModal(id){
+  editingEventId=id||null;
+  var ev=id?getEvent(id):null;
+  document.getElementById('ev-modal-title').textContent=ev?'Modifier la soirée':'Nouvelle soirée';
+  document.getElementById('ev-title').value=ev?ev.title:'';
+  document.getElementById('ev-date').value=ev?(ev.date||''):'';
+  document.getElementById('ev-time').value=ev?(ev.time||'20:00'):'20:00';
+  document.getElementById('ev-place').value=ev?(ev.place||''):'';
+  document.getElementById('ev-buyin').value=ev?ev.buyin:20;
+  document.getElementById('ev-seats').value=ev?ev.seats:8;
+  document.getElementById('ev-pass').value=ev?(ev.pass||''):'';
+  document.getElementById('ev-notes').value=ev?(ev.notes||''):'';
+  document.getElementById('ev-delete').style.display=ev?'':'none';
+  openModal('ov-event');
+}
+function saveEvent(){
+  var title=document.getElementById('ev-title').value.trim();
+  if(!title){toast('Donne un nom à la soirée');return}
+  var data={
+    title:title,
+    date:document.getElementById('ev-date').value,
+    time:document.getElementById('ev-time').value,
+    place:document.getElementById('ev-place').value.trim(),
+    buyin:parseInt(document.getElementById('ev-buyin').value,10)||0,
+    seats:Math.min(Math.max(parseInt(document.getElementById('ev-seats').value,10)||8,2),10),
+    pass:document.getElementById('ev-pass').value.trim(),
+    notes:document.getElementById('ev-notes').value.trim()
+  };
+  if(editingEventId){
+    var ev=getEvent(editingEventId);
+    Object.keys(data).forEach(function(k){ev[k]=data[k]});
+  } else {
+    data.id=uid();data.invites=[];data.items=[];data.results=null;data.levelMin=15;data.createdAt=Date.now();
+    db.events.push(data);
+    view.page='event';view.eventId=data.id;
+  }
+  saveDB();closeModal('ov-event');render();
+  toast(editingEventId?'Soirée mise à jour':'Soirée créée');
+}
+function deleteEvent(){
+  if(!editingEventId)return;
+  if(!confirm('Supprimer cette soirée ?'))return;
+  db.events=db.events.filter(function(e){return e.id!==editingEventId});
+  saveDB();closeModal('ov-event');go('dashboard');toast('Soirée supprimée');
+}
+function duplicateEvent(id){
+  var ev=getEvent(id);if(!ev)return;
+  var copy=JSON.parse(JSON.stringify(ev));
+  copy.id=uid();copy.title=ev.title+' (copie)';copy.date='';copy.results=null;copy.createdAt=Date.now();
+  copy.invites.forEach(function(i){i.id=uid();i.status='pending';i.paid=false;i.rebuys=0;i.attended=null});
+  copy.items.forEach(function(it){it.id=uid();it.invId=null});
+  db.events.push(copy);
+  saveDB();go('event',copy.id);
+  toast('Soirée dupliquée — fixe la nouvelle date');
+}
+
+/* ---------- export .ics ---------- */
+function icsStamp(d){
+  function pad(n){return (n<10?'0':'')+n}
+  return d.getFullYear()+pad(d.getMonth()+1)+pad(d.getDate())+'T'+pad(d.getHours())+pad(d.getMinutes())+'00';
+}
+function eventDates(ev){
+  var start=new Date(ev.date+'T'+(ev.time||'20:00'));
+  return {start:start,end:new Date(start.getTime()+5*3600*1000)};
+}
+function addToGoogleCalendar(id){
+  var ev=getEvent(id);if(!ev)return;
+  if(!ev.date){toast('Fixe d\'abord une date');return}
+  var d=eventDates(ev);
+  var url='https://calendar.google.com/calendar/render?action=TEMPLATE'+
+    '&text='+encodeURIComponent(ev.title||'Soirée poker')+
+    '&dates='+icsStamp(d.start)+'/'+icsStamp(d.end)+
+    '&location='+encodeURIComponent(ev.place||'')+
+    '&details='+encodeURIComponent('Buy-in '+ev.buyin+' €, '+ev.seats+' places.'+(ev.notes?' '+ev.notes:''));
+  openExternal(url);
+}
+function downloadICS(id){
+  var ev=getEvent(id);if(!ev)return;
+  if(!ev.date){toast('Fixe d\'abord une date');return}
+  var d=eventDates(ev);
+  var desc=('Buy-in '+ev.buyin+' EUR, '+ev.seats+' places.'+(ev.notes?' '+ev.notes:'')).replace(/\n/g,'\\n');
+  var ics='BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//PokerNight//FR\r\nBEGIN:VEVENT\r\n'+
+    'UID:'+ev.id+'@pokernight\r\nDTSTAMP:'+icsStamp(new Date())+'\r\n'+
+    'DTSTART:'+icsStamp(d.start)+'\r\nDTEND:'+icsStamp(d.end)+'\r\n'+
+    'SUMMARY:'+(ev.title||'Soirée poker').replace(/,/g,'\\,')+'\r\n'+
+    'LOCATION:'+(ev.place||'').replace(/,/g,'\\,')+'\r\n'+
+    'DESCRIPTION:'+desc.replace(/,/g,'\\,')+'\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n';
+  var blob=new Blob([ics],{type:'text/calendar;charset=utf-8'});
+  var url=URL.createObjectURL(blob);
+  var a=document.createElement('a');
+  a.href=url;
+  a.download=(ev.title||'soiree-poker').replace(/[^a-z0-9]+/gi,'-').toLowerCase()+'.ics';
+  document.body.appendChild(a);   /* obligatoire pour Firefox */
+  a.click();
+  document.body.removeChild(a);
+  setTimeout(function(){URL.revokeObjectURL(url)},2000); /* révoquer trop tôt annule le téléchargement */
+}
+
+/* ---------- invitations / statuts / liste d'attente ---------- */
+function invite(eventId,playerId){
+  var ev=getEvent(eventId);
+  if(ev.invites.some(function(i){return i.playerId===playerId}))return;
+  ev.invites.push({id:uid(),playerId:playerId,guestName:null,status:'pending',paid:false,rebuys:0,attended:null});
+  saveDB();render();
+}
+function uninvite(eventId,invId){
+  var ev=getEvent(eventId);
+  var inv=getInvite(ev,invId);
+  var wasYes=inv&&inv.status==='yes';
+  ev.invites=ev.invites.filter(function(i){return i.id!==invId});
+  if(wasYes)promoteWaitlist(ev);
+  saveDB();render();
+}
+function setStatus(eventId,invId,status){
+  var ev=getEvent(eventId);
+  var inv=getInvite(ev,invId);
+  if(!inv)return;
+  var wasYes=inv.status==='yes';
+  if(status==='yes'&&!wasYes&&confirmed(ev).length>=ev.seats){
+    inv.status='waitlist';
+    saveDB();render();
+    toast('Table pleine — '+invName(inv)+' passe en liste d\'attente');
+    return;
+  }
+  inv.status=status;
+  if(wasYes&&status!=='yes')promoteWaitlist(ev);
+  saveDB();render();
+}
+function promoteWaitlist(ev){
+  if(confirmed(ev).length>=ev.seats)return;
+  var next=ev.invites.find(function(i){return i.status==='waitlist'});
+  if(next){
+    next.status='yes';
+    toast(invName(next)+' promu depuis la liste d\'attente 🎉');
+  }
+}
+function setAttended(eventId,invId,val){
+  var ev=getEvent(eventId);
+  var inv=getInvite(ev,invId);
+  if(!inv)return;
+  inv.attended=(inv.attended===val)?null:val;
+  saveDB();render();
+}
+function guestToPlayer(eventId,invId){
+  var ev=getEvent(eventId);
+  var inv=getInvite(ev,invId);
+  if(!inv||inv.playerId)return;
+  var p={id:uid(),name:inv.guestName||'Invité',phone:'',type:'ami_ami',refBy:null,refByName:'RSVP',createdAt:Date.now()};
+  db.players.push(p);
+  inv.playerId=p.id;
+  saveDB();render();
+  toast(p.name+' ajouté au carnet (ami d\'ami)');
+}
+
+/* ---------- paiements ---------- */
+function togglePaid(eventId,invId){
+  var ev=getEvent(eventId),inv=getInvite(ev,invId);
+  if(!inv)return;
+  inv.paid=!inv.paid;saveDB();render();
+}
+function rebuy(eventId,invId,delta){
+  var ev=getEvent(eventId),inv=getInvite(ev,invId);
+  if(!inv)return;
+  inv.rebuys=Math.max(0,(inv.rebuys||0)+delta);
+  saveDB();render();
+}
+
+/* ---------- qui amène quoi ---------- */
+function addItem(eventId){
+  var inp=document.getElementById('item-label');
+  var label=inp.value.trim();
+  if(!label){toast('Écris quoi amener');return}
+  getEvent(eventId).items.push({id:uid(),label:label,invId:null});
+  saveDB();render();
+  var again=document.getElementById('item-label');
+  if(again)again.focus();
+}
+function assignItem(eventId,itemId,invId){
+  var ev=getEvent(eventId);
+  var it=ev.items.find(function(x){return x.id===itemId});
+  if(it){it.invId=invId||null;saveDB();render()}
+}
+function removeItem(eventId,itemId){
+  var ev=getEvent(eventId);
+  ev.items=ev.items.filter(function(x){return x.id!==itemId});
+  saveDB();render();
+}
+
+/* ---------- résultats ---------- */
+function openResults(eventId){
+  var ev=getEvent(eventId);
+  resultsEventId=eventId;
+  var conf=confirmed(ev);
+  if(!conf.length){toast('Aucun joueur confirmé');return}
+  var rows='';
+  conf.forEach(function(inv,i){
+    var nm=invName(inv);
+    var prev=(ev.results||[]).find(function(r){return (r.playerId&&r.playerId===inv.playerId)||r.name===nm});
+    rows+='<div class="res-row" data-inv="'+inv.id+'">'+
+      '<span>'+esc(nm)+'</span>'+
+      '<input type="number" min="1" max="'+conf.length+'" class="r-rank" value="'+(prev?prev.rank:i+1)+'" aria-label="Place de '+esc(nm)+'">'+
+      '<input type="number" step="5" class="r-net" value="'+(prev?prev.net:0)+'" aria-label="Net de '+esc(nm)+'">'+
+    '</div>';
+  });
+  document.getElementById('res-rows').innerHTML=rows;
+  openModal('ov-results');
+}
+function saveResults(){
+  var ev=getEvent(resultsEventId);
+  if(!ev)return;
+  var results=[];
+  document.querySelectorAll('#res-rows .res-row').forEach(function(row){
+    var inv=getInvite(ev,row.getAttribute('data-inv'));
+    if(!inv)return;
+    results.push({
+      playerId:inv.playerId||null,
+      name:invName(inv),
+      rank:parseInt(row.querySelector('.r-rank').value,10)||0,
+      net:parseInt(row.querySelector('.r-net').value,10)||0
+    });
+  });
+  var sum=results.reduce(function(a,r){return a+r.net},0);
+  ev.results=results;
+  saveDB();closeModal('ov-results');render();
+  toast(sum===0?'Résultats enregistrés':'Résultats enregistrés — attention, la somme des nets fait '+sum+' € (pas zéro)');
+}
+
+/* ---------- message d'invitation ---------- */
+function showInvite(eventId){
+  var ev=getEvent(eventId);
+  var free=ev.seats-confirmed(ev).length;
+  var rsvpLine=fs?'\n👉 Inscris-toi ici : '+rsvpUrl(ev.id)+
+    (ev.pass?'\n🔑 Mot de passe de la table : '+ev.pass:'')+'\n':'';
+  inviteMessage='♠️ SOIRÉE POKER — '+(ev.title||'')+'\n\n'+
+    '🗓 '+fmtDate(ev.date,ev.time)+'\n'+
+    '📍 '+(ev.place||'Lieu à confirmer')+'\n'+
+    '💰 Buy-in : '+ev.buyin+' €\n'+
+    '👥 '+ev.seats+' places'+(free>0?' — encore '+free+' de libre'+(free>1?'s':''):' — complet, liste d\'attente')+'\n'+
+    (ev.notes?'\n📝 '+ev.notes+'\n':'')+rsvpLine+
+    '\nRéponds-moi par OUI / NON pour réserver ta place. Tu peux ramener un pote sérieux 😉';
+  document.getElementById('invite-text').textContent=inviteMessage;
+  openModal('ov-invite');
+}
+function copyInvite(){
+  copyText(inviteMessage,'Message copié');
+}
+function copyText(text,okMsg){
+  if(navigator.clipboard&&navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(function(){toast(okMsg)},function(){copyFallback(text,okMsg)});
+  } else copyFallback(text,okMsg);
+}
+function copyFallback(text,okMsg){
+  var ta=document.createElement('textarea');
+  ta.value=text;ta.style.position='fixed';ta.style.opacity='0';
+  document.body.appendChild(ta);ta.focus();ta.select();
+  try{document.execCommand('copy');toast(okMsg)}
+  catch(e){toast('Copie impossible — sélectionne le texte manuellement')}
+  document.body.removeChild(ta);
+}
+function openExternal(url){
+  /* anchor cliqué = pas bloqué par les bloqueurs de popups, contrairement à window.open */
+  var a=document.createElement('a');
+  a.href=url;a.target='_blank';a.rel='noopener';
+  document.body.appendChild(a);a.click();document.body.removeChild(a);
+}
+function sendInviteWhatsApp(){
+  openExternal('https://api.whatsapp.com/send?text='+encodeURIComponent(inviteMessage));
+}
+function stripEmoji(s){
+  /* les clients mail gèrent mal les emojis dans mailto: — on les retire pour l'email */
+  return s.replace(/[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}\u{2190}-\u{21FF}\u{FE0F}\u{200D}]/gu,'').replace(/ +/g,' ').replace(/^ /gm,'');
+}
+function sendInviteEmail(){
+  var plain=stripEmoji(inviteMessage);
+  var subject=plain.split('\n')[0].trim();
+  var a=document.createElement('a');
+  a.href='mailto:?subject='+encodeURIComponent(subject)+'&body='+encodeURIComponent(plain);
+  document.body.appendChild(a);a.click();document.body.removeChild(a);
+}
+function rsvpUrl(eventId){
+  return location.origin+location.pathname+'?rsvp='+eventId;
+}
+function copyRsvpLink(eventId){
+  navigator.clipboard.writeText(rsvpUrl(eventId)).then(function(){
+    toast('Lien RSVP copié — envoie-le à tes invités');
+  });
+}
+
+/* =====================================================
+   ACTIONS — joueurs
+===================================================== */
+function openPlayerModal(id){
+  editingPlayerId=id||null;
+  var p=id?getPlayer(id):null;
+  document.getElementById('pl-modal-title').textContent=p?'Modifier le joueur':'Nouveau joueur';
+  document.getElementById('pl-name').value=p?p.name:'';
+  document.getElementById('pl-phone').value=p?(p.phone||''):'';
+  document.getElementById('pl-type').value=p?p.type:'ami';
+  var sel=document.getElementById('pl-ref');
+  sel.innerHTML=db.players.filter(function(x){return x.type==='ami'&&(!p||x.id!==p.id)})
+    .map(function(x){return '<option value="'+x.id+'">'+esc(x.name)+'</option>'}).join('')
+    ||'<option value="">— Ajoute d\'abord un ami direct —</option>';
+  if(p&&p.refBy)sel.value=p.refBy;
+  document.getElementById('pl-delete').style.display=p?'':'none';
+  toggleRefField();
+  openModal('ov-player');
+}
+function toggleRefField(){
+  document.getElementById('pl-ref-field').style.display=
+    document.getElementById('pl-type').value==='ami_ami'?'':'none';
+}
+function savePlayer(){
+  var name=document.getElementById('pl-name').value.trim();
+  if(!name){toast('Le nom est obligatoire');return}
+  var phone=document.getElementById('pl-phone').value.trim();
+  var type=document.getElementById('pl-type').value;
+  var refBy=type==='ami_ami'?document.getElementById('pl-ref').value:null;
+  if(editingPlayerId){
+    var p=getPlayer(editingPlayerId);
+    p.name=name;p.phone=phone;p.type=type;p.refBy=refBy;
+  } else {
+    db.players.push({id:uid(),name:name,phone:phone,type:type,refBy:refBy,createdAt:Date.now()});
+  }
+  saveDB();closeModal('ov-player');render();
+  toast(editingPlayerId?'Joueur mis à jour':'Joueur ajouté au carnet');
+}
+function deletePlayer(){
+  if(!editingPlayerId)return;
+  if(!confirm('Supprimer ce joueur ? Il sera aussi retiré des soirées.'))return;
+  db.events.forEach(function(e){
+    e.invites=e.invites.filter(function(i){return i.playerId!==editingPlayerId});
+  });
+  db.players=db.players.filter(function(p){return p.id!==editingPlayerId});
+  saveDB();closeModal('ov-player');render();
+  toast('Joueur supprimé');
+}
+
+/* =====================================================
+   TIMER DE TOURNOI
+===================================================== */
+var BLIND_STRUCTURE=[[25,50],[50,100],[75,150],[100,200],[150,300],[200,400],[300,600],[400,800],[600,1200],[800,1600],[1000,2000],[1500,3000]];
+var timer={eventId:null,level:0,remaining:0,duration:15*60,running:false,handle:null};
+
+function openTimer(eventId){
+  var ev=getEvent(eventId);
+  timer.eventId=eventId;
+  timer.duration=(ev&&ev.levelMin?ev.levelMin:15)*60;
+  timer.level=0;
+  timer.remaining=timer.duration;
+  timer.running=false;
+  clearInterval(timer.handle);
+  document.getElementById('t-min').value=Math.round(timer.duration/60);
+  updateTimerUI();
+  document.getElementById('timer-overlay').classList.add('open');
+}
+function closeTimer(){
+  timer.running=false;clearInterval(timer.handle);
+  document.getElementById('timer-overlay').classList.remove('open');
+}
+function timerToggle(){
+  if(timer.running){
+    timer.running=false;clearInterval(timer.handle);
+  } else {
+    timer.running=true;
+    timer.handle=setInterval(function(){
+      timer.remaining--;
+      if(timer.remaining<=0){
+        beep();
+        if(timer.level<BLIND_STRUCTURE.length-1){
+          timer.level++;timer.remaining=timer.duration;
+          toast('Niveau '+(timer.level+1)+' — blinds '+BLIND_STRUCTURE[timer.level][0]+'/'+BLIND_STRUCTURE[timer.level][1]);
+        } else {
+          timer.remaining=0;timer.running=false;clearInterval(timer.handle);
+        }
+      }
+      updateTimerUI();
+    },1000);
+  }
+  updateTimerUI();
+}
+function timerNext(){
+  if(timer.level<BLIND_STRUCTURE.length-1){timer.level++;timer.remaining=timer.duration;updateTimerUI()}
+}
+function timerPrev(){
+  if(timer.level>0){timer.level--;timer.remaining=timer.duration;updateTimerUI()}
+}
+function timerSetDuration(){
+  var m=Math.min(Math.max(parseInt(document.getElementById('t-min').value,10)||15,3),60);
+  timer.duration=m*60;
+  timer.remaining=Math.min(timer.remaining,timer.duration)||timer.duration;
+  var ev=getEvent(timer.eventId);
+  if(ev){ev.levelMin=m;saveDB()}
+  updateTimerUI();
+}
+function updateTimerUI(){
+  var mm=Math.floor(timer.remaining/60),ss=timer.remaining%60;
+  var clock=document.getElementById('t-clock');
+  clock.textContent=(mm<10?'0':'')+mm+':'+(ss<10?'0':'')+ss;
+  clock.className='t-clock'+(timer.remaining<=60&&timer.running?' t-warning':'');
+  document.getElementById('t-level').textContent='Niveau '+(timer.level+1)+' / '+BLIND_STRUCTURE.length;
+  document.getElementById('t-blinds').textContent=BLIND_STRUCTURE[timer.level][0]+' / '+BLIND_STRUCTURE[timer.level][1];
+  document.getElementById('t-next').textContent=timer.level<BLIND_STRUCTURE.length-1
+    ?'Niveau suivant : '+BLIND_STRUCTURE[timer.level+1][0]+' / '+BLIND_STRUCTURE[timer.level+1][1]
+    :'Dernier niveau';
+  document.getElementById('t-playpause').textContent=timer.running?'⏸ Pause':'▶ Démarrer';
+}
+function beep(){
+  try{
+    var ctx=new (window.AudioContext||window.webkitAudioContext)();
+    [0,0.25,0.5].forEach(function(t){
+      var o=ctx.createOscillator(),g=ctx.createGain();
+      o.connect(g);g.connect(ctx.destination);
+      o.frequency.value=880;g.gain.value=.25;
+      o.start(ctx.currentTime+t);o.stop(ctx.currentTime+t+.18);
+    });
+  }catch(e){}
+}
+
+/* =====================================================
+   PAGE D'INSCRIPTION PUBLIQUE  (?rsvp=EVENTID)
+   Nécessite Firebase. "Compte" = profil joueur léger :
+   enregistré dans la base partagée + mémorisé dans le
+   localStorage du visiteur (reconnu à sa prochaine visite).
+===================================================== */
+var RSVP_ID=new URLSearchParams(location.search).get('rsvp');
+var PROFILE_KEY='pokernight_profile';
+function getProfile(){
+  try{return JSON.parse(localStorage.getItem(PROFILE_KEY))||null}catch(e){return null}
+}
+function saveProfile(p){localStorage.setItem(PROFILE_KEY,JSON.stringify(p))}
+function clearProfile(){localStorage.removeItem(PROFILE_KEY);renderRsvp()}
+
+function renderRsvp(){
+  document.getElementById('app-header').style.display='none';
+  var app=document.getElementById('app');
+  if(!FIREBASE_CONFIG){
+    app.innerHTML='<div class="rsvp-card"><h2>♠ Poker Night</h2><p class="hint">L\'inscription en ligne n\'est pas activée sur cette installation (Firebase non configuré). Réponds directement à la personne qui t\'a invité.</p></div>';
+    return;
+  }
+  app.innerHTML='<div class="rsvp-card"><h2>♠ Poker Night</h2><p class="hint">Chargement de la table…</p></div>';
+  var wait=setInterval(function(){
+    if(!fs)return;
+    clearInterval(wait);
+    fs.collection('pokernight').doc('state').get().then(function(doc){
+      if(!doc.exists){app.innerHTML='<div class="rsvp-card"><h2>♠ Poker Night</h2><p class="hint">Table introuvable.</p></div>';return}
+      db=migrate(doc.data().db);
+      var ev=getEvent(RSVP_ID);
+      if(!ev){app.innerHTML='<div class="rsvp-card"><h2>♠ Poker Night</h2><p class="hint">Table introuvable ou supprimée.</p></div>';return}
+      var free=ev.seats-confirmed(ev).length;
+      var profile=getProfile();
+      var known=profile&&getPlayer(profile.playerId);
+
+      var identBlock;
+      if(known){
+        identBlock='<p class="hint" style="margin-top:16px">Connecté en tant que <b>'+esc(known.name)+'</b> · '+
+          '<a href="#" style="color:var(--brass)" onclick="clearProfile();return false">pas toi ?</a></p>';
+      } else {
+        identBlock='<div class="field" style="margin-top:18px"><label for="rsvp-name">Ton prénom + nom (création de ton profil joueur)</label>'+
+          '<input id="rsvp-name" placeholder="Marc Weber" autocomplete="name"></div>'+
+          '<div class="field"><label for="rsvp-phone">Téléphone (optionnel)</label>'+
+          '<input id="rsvp-phone" placeholder="+352 …" autocomplete="tel"></div>';
+      }
+      var passBlock=ev.pass
+        ?'<div class="field"><label for="rsvp-pass">🔑 Mot de passe de la table</label>'+
+         '<input id="rsvp-pass" placeholder="Demande-le à l\'organisateur" autocomplete="off"></div>'
+        :'';
+
+      app.innerHTML='<div class="rsvp-card"><h2>'+esc(ev.title||'Soirée poker')+'</h2>'+
+        '<div class="detail-meta">🗓 <b>'+esc(fmtDate(ev.date,ev.time))+'</b><br>📍 '+esc(ev.place||'Lieu à confirmer')+
+        '<br>💰 Buy-in <b>'+ev.buyin+' €</b> · '+(free>0?free+' place'+(free>1?'s':'')+' libre'+(free>1?'s':''):'complet — tu seras en liste d\'attente')+
+        (ev.notes?'<br>📝 '+esc(ev.notes):'')+'</div>'+
+        identBlock+passBlock+
+        '<div class="rsvp-yesno">'+
+          '<button class="btn btn-primary" onclick="rsvpAnswer(\'yes\')">✓ Je m\'inscris</button>'+
+          '<button class="btn btn-ghost" onclick="rsvpAnswer(\'no\')">Je passe mon tour</button>'+
+        '</div></div>';
+    }).catch(function(){
+      app.innerHTML='<div class="rsvp-card"><h2>♠ Poker Night</h2><p class="hint">Connexion impossible. Vérifie ta connexion et recharge la page.</p></div>';
+    });
+  },300);
+}
+
+function rsvpAnswer(status){
+  fs.collection('pokernight').doc('state').get().then(function(doc){
+    db=migrate(doc.data().db);
+    var ev=getEvent(RSVP_ID);
+    if(!ev){toast('Table introuvable');return}
+
+    /* mot de passe (revalidé sur données fraîches) */
+    if(ev.pass){
+      var passInput=document.getElementById('rsvp-pass');
+      var given=passInput?passInput.value.trim():'';
+      if(given!==ev.pass){toast('Mot de passe incorrect');return}
+    }
+
+    /* identité : profil existant ou création de compte */
+    var profile=getProfile();
+    var player=profile?getPlayer(profile.playerId):null;
+    if(!player){
+      var nameInput=document.getElementById('rsvp-name');
+      var name=nameInput?nameInput.value.trim():'';
+      if(!name){toast('Indique ton nom pour créer ton profil');return}
+      var phoneInput=document.getElementById('rsvp-phone');
+      var phone=phoneInput?phoneInput.value.trim():'';
+      /* retrouve un joueur du carnet portant exactement ce nom, sinon crée le profil */
+      var lower=name.toLowerCase();
+      player=db.players.find(function(p){return p.name.toLowerCase()===lower});
+      if(!player){
+        player={id:uid(),name:name,phone:phone,type:'ami_ami',refBy:null,refByName:'Inscription en ligne',createdAt:Date.now()};
+        db.players.push(player);
+      } else if(phone&&!player.phone){
+        player.phone=phone;
+      }
+      saveProfile({playerId:player.id,name:player.name});
+    }
+
+    /* invitation liée au joueur */
+    var inv=ev.invites.find(function(i){return i.playerId===player.id});
+    if(!inv){
+      inv={id:uid(),playerId:player.id,guestName:null,status:'pending',paid:false,rebuys:0,attended:null};
+      ev.invites.push(inv);
+    }
+    if(status==='yes'&&inv.status!=='yes'&&confirmed(ev).length>=ev.seats){
+      inv.status='waitlist';
+    } else {
+      inv.status=status;
+      if(status==='no')promoteWaitlist(ev);
+    }
+
+    fs.collection('pokernight').doc('state')
+      .set({db:db,_client:'rsvp-'+uid(),updatedAt:Date.now()})
+      .then(function(){
+        document.getElementById('app').innerHTML='<div class="rsvp-card"><h2>♠ '+
+          (status==='yes'?(inv.status==='waitlist'?'Tu es en liste d\'attente':'Place réservée, '+esc(player.name.split(' ')[0])+' !'):'Dommage, à la prochaine !')+
+          '</h2><p class="hint">'+
+          (inv.status==='waitlist'
+            ?'La table est pleine pour l\'instant. Si quelqu\'un se désiste, tu seras promu automatiquement — l\'organisateur te préviendra.'
+            :'Ta réponse a été transmise à l\'organisateur. Ton profil est mémorisé sur cet appareil : la prochaine fois, un clic suffira.')+
+          '</p></div>';
+      })
+      .catch(function(){toast('Enregistrement impossible — réessaie')});
+  });
+}
+
+/* ---------- divers ---------- */
+document.querySelectorAll('.overlay').forEach(function(ov){
+  ov.addEventListener('click',function(e){if(e.target===ov)ov.classList.remove('open')});
+});
+document.addEventListener('keydown',function(e){
+  if(e.key==='Escape')document.querySelectorAll('.overlay.open').forEach(function(o){o.classList.remove('open')});
+});
+if('serviceWorker' in navigator && location.protocol==='https:'){
+  navigator.serviceWorker.register('sw.js').catch(function(){});
+}
+
+/* Render immédiat — pas d'attente Firebase */
+if(RSVP_ID){renderRsvp()}else{render()}
+
+/* Firebase se connecte en arrière-plan et re-render quand prêt */
+initFirebase();
+</script>
+</body>
+</html>
