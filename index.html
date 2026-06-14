@@ -64,6 +64,18 @@ main{max-width:980px;margin:0 auto;padding:10px 22px 80px}
 .seat-count b{color:var(--cream)}
 .event-card.past{opacity:.55}
 .event-card.past:hover{transform:none}
+
+/* avatars */
+.av{width:38px;height:38px;border-radius:50%;object-fit:cover;flex-shrink:0;border:2px solid rgba(201,164,92,.4);background:var(--felt-3)}
+.av-seat{width:100%;height:100%;border-radius:50%;object-fit:cover}
+.av-pick{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin-top:8px}
+.av-pick img,.av-pick .av-svg{width:48px;height:48px;border-radius:50%;cursor:pointer;border:3px solid transparent;transition:.15s;object-fit:cover}
+.av-pick img:hover,.av-pick .av-svg:hover{border-color:var(--brass)}
+.av-pick img.sel,.av-pick .av-svg.sel{border-color:var(--brass);box-shadow:0 0 0 2px var(--brass)}
+.av-upload-btn{display:flex;align-items:center;justify-content:center;width:48px;height:48px;border-radius:50%;border:2px dashed rgba(245,239,227,.3);cursor:pointer;color:var(--cream-dim);font-size:20px;transition:.15s}
+.av-upload-btn:hover{border-color:var(--brass);color:var(--brass)}
+.av-section{margin-bottom:14px}
+.av-section label{display:block;font-size:13px;font-weight:600;color:var(--cream-dim);margin-bottom:8px}
 .card-delete{
   position:absolute;top:10px;right:10px;
   width:26px;height:26px;border-radius:50%;
@@ -263,6 +275,11 @@ main{max-width:980px;margin:0 auto;padding:10px 22px 80px}
     <h3 id="pl-modal-title">Nouveau joueur</h3>
     <div class="field"><label for="pl-name">Nom</label><input id="pl-name" placeholder="Marc"></div>
     <div class="field"><label for="pl-phone">Téléphone (optionnel)</label><input id="pl-phone" placeholder="+352 …"></div>
+    <div class="av-section">
+      <label>Photo de profil</label>
+      <div class="av-pick" id="pl-av-grid"></div>
+      <input type="file" id="pl-av-file" accept="image/*" style="display:none" onchange="onAvatarFile(this)">
+    </div>
     <div class="field"><label for="pl-type">Cercle</label>
       <select id="pl-type" onchange="toggleRefField()">
         <option value="ami">Ami direct</option>
@@ -567,9 +584,9 @@ function renderEventDetail(){
       attendBtns='<button class="icon-btn'+(inv.attended===true?' active-ok':'')+'" title="Était présent" aria-label="Présent" onclick="setAttended(\''+ev.id+'\',\''+inv.id+'\',true)">👤</button>'+
         '<button class="icon-btn'+(inv.attended===false?' active-ko':'')+'" title="No-show" aria-label="Absent" onclick="setAttended(\''+ev.id+'\',\''+inv.id+'\',false)">🚫</button>';
     }
-    h+='<div class="row"><div class="avatar">'+esc(initial(nm))+'</div>'+
-      '<div class="info"><div class="nm">'+esc(nm)+guest+'</div>'+
-      '<div class="ref">'+(inv.playerId?refLabel(getPlayer(inv.playerId)):'Inscription par lien')+'</div></div>'+badge+
+    var _p1=inv.playerId?getPlayer(inv.playerId):null;
+    h+='<div class="row">'+avatarHtml(_p1,38)+'<div class="info"><div class="nm">'+esc(nm)+guest+'</div>'+
+      '<div class="ref">'+(_p1?refLabel(_p1):'Inscription par lien')+'</div></div>'+badge+
       '<div class="acts">'+attendBtns+
         (inv.status!=='yes'?'<button class="icon-btn ok" title="Confirmer" aria-label="Confirmer '+esc(nm)+'" onclick="setStatus(\''+ev.id+'\',\''+inv.id+'\',\'yes\')">✓</button>':'')+
         (inv.status!=='no'?'<button class="icon-btn ko" title="Refuser" aria-label="Marquer refusé" onclick="setStatus(\''+ev.id+'\',\''+inv.id+'\',\'no\')">✕</button>':'')+
@@ -595,8 +612,7 @@ function renderEventDetail(){
   else if(!suggestions.length) h+='<div class="hint">Tout le carnet est déjà invité.</div>';
   suggestions.forEach(function(p){
     var f=fiabilite(p);
-    h+='<div class="row"><div class="avatar">'+esc(initial(p.name))+'</div>'+
-      '<div class="info"><div class="nm">'+esc(p.name)+' '+
+    h+='<div class="row">'+avatarHtml(p,38)+'<div class="info"><div class="nm">'+esc(p.name)+' '+
       (p.type==='ami'?'<span class="badge ami">Ami</span>':'<span class="badge amiami">Ami d\'ami</span>')+'</div>'+
       '<div class="ref">'+refLabel(p)+(f!==null?' · '+fiabHtml(f):'')+'</div></div>'+
       '<button class="btn btn-sm btn-primary" onclick="invite(\''+ev.id+'\',\''+p.id+'\')">Inviter</button></div>';
@@ -613,8 +629,8 @@ function renderEventDetail(){
       '</div>';
     conf.forEach(function(inv){
       var nm=invName(inv);
-      h+='<div class="row"><div class="avatar">'+esc(initial(nm))+'</div>'+
-        '<div class="info"><div class="nm">'+esc(nm)+'</div></div>'+
+      var _pp=inv.playerId?getPlayer(inv.playerId):null;
+      h+='<div class="row">'+avatarHtml(_pp,38)+'<div class="info"><div class="nm">'+esc(nm)+'</div></div>'+
         '<button class="pay-toggle'+(inv.paid?' paid':'')+'" onclick="togglePaid(\''+ev.id+'\',\''+inv.id+'\')">'+(inv.paid?'✓ Payé':'Buy-in dû')+'</button>'+
         '<div class="rebuy-ctl"><span style="font-size:12px;color:var(--text-dim)">Re-buy</span>'+
           '<button class="icon-btn" aria-label="Retirer un re-buy" onclick="rebuy(\''+ev.id+'\',\''+inv.id+'\',-1)">−</button>'+
@@ -644,7 +660,9 @@ function renderEventDetail(){
   if(ev.results&&ev.results.length){
     h+='<div class="panel" style="margin-top:26px"><h3>Résultats</h3>';
     ev.results.slice().sort(function(a,b){return a.rank-b.rank}).forEach(function(r){
+      var _pr=r.playerId?getPlayer(r.playerId):null;
       h+='<div class="row"><span class="lb-rank" style="width:30px">'+r.rank+'</span>'+
+        avatarHtml(_pr,34)+
         '<div class="info"><div class="nm">'+esc(r.name)+(r.rank===1?' 🏆':'')+'</div></div>'+
         '<span class="'+(r.net>=0?'net-pos':'net-neg')+'">'+(r.net>=0?'+':'')+r.net+' €</span></div>';
     });
@@ -670,8 +688,12 @@ function renderSeats(ev,conf,pend){
     var inv=occupants[i];
     if(inv){
       var nm=invName(inv), cls=inv.status==='yes'?'confirmed':'pending';
+      var _ps=inv.playerId?getPlayer(inv.playerId):null;
+      var seatInner=(_ps&&_ps.avatar)
+        ?'<img src="'+_ps.avatar+'" class="av-seat" alt="'+esc(nm)+'">'
+        :esc(initial(nm));
       html+='<div class="seat '+cls+'" style="left:'+x+'%;top:'+y+'%" title="'+esc(nm)+(inv.status==='yes'?' (confirmé)':' (en attente)')+'">'+
-        esc(initial(nm))+'<span class="name-tag">'+esc(nm)+'</span></div>';
+        seatInner+'<span class="name-tag">'+esc(nm)+'</span></div>';
     } else {
       html+='<div class="seat free" style="left:'+x+'%;top:'+y+'%" title="Place libre">+</div>';
     }
@@ -712,8 +734,7 @@ function renderPlayers(){
       return e.invites.some(function(i){return i.playerId===p.id&&i.status==='yes'});
     }).length;
     var f=fiabilite(p);
-    return '<div class="player-card"><div class="avatar">'+esc(initial(p.name))+'</div>'+
-      '<div class="info"><div class="nm">'+esc(p.name)+'</div>'+
+    return '<div class="player-card">'+avatarHtml(p,42)+'<div class="info"><div class="nm">'+esc(p.name)+'</div>'+
       '<div class="ref">'+refLabel(p)+' · '+played+' soirée'+(played>1?'s':'')+
       (f!==null?'<br>'+fiabHtml(f):'')+'</div></div>'+
       '<button class="btn btn-ghost btn-sm" onclick="openPlayerModal(\''+p.id+'\')">Modifier</button></div>';
@@ -791,6 +812,12 @@ function saveEvent(){
   } else {
     data.id=uid();data.invites=[];data.items=[];data.results=null;data.levelMin=15;data.createdAt=Date.now();data.creatorId=CLIENT_ID;
     db.events.push(data);
+    /* ajouter le créateur automatiquement comme confirmé */
+    var profile=getProfile();
+    var creatorPlayer=profile?getPlayer(profile.playerId):null;
+    if(creatorPlayer){
+      data.invites.push({id:uid(),playerId:creatorPlayer.id,guestName:null,status:'yes',paid:true,rebuys:0,attended:null});
+    }
     view.page='event';view.eventId=data.id;
   }
   saveDB();closeModal('ov-event');render();
@@ -1059,8 +1086,94 @@ function copyRsvpLink(eventId){
 }
 
 /* =====================================================
-   ACTIONS — joueurs
+   AVATARS — 12 visages SVG + upload photo
 ===================================================== */
+var PRESET_AVATARS = (function(){
+  /* 12 têtes stylisées : couleur peau × expression, encodées en data URI SVG */
+  var skins=['#FDBCB4','#F1A07B','#D4896A','#C26B4A','#8D5524','#4A2C17'];
+  var hairs=['#2C1810','#6B3D2E','#D4943A','#F5C842','#C0C0C0','#1A1A2E'];
+  var acc=['#C9402F','#2E5E8C','#2D6A4F','#7B3F9E','#C9A45C','#D97A6C',
+           '#3EC97A','#E8944A','#4A8FE8','#E84040','#D4A843','#40916C'];
+  var avs=[];
+  for(var i=0;i<12;i++){
+    var sk=skins[i%skins.length];
+    var hr=hairs[i%hairs.length];
+    var ac=acc[i];
+    var smile=i%3===0?'M8,14 Q12,18 16,14':'M8,13 Q12,16 16,13';
+    var eye=i%4===3?'fill="'+hr+'" rx="3" ry="2"':'fill="'+hr+'"';
+    avs.push('data:image/svg+xml;utf8,'+encodeURIComponent(
+      '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">'+
+      '<circle cx="24" cy="24" r="24" fill="'+ac+'"/>'+
+      '<circle cx="24" cy="20" r="11" fill="'+sk+'"/>'+
+      '<ellipse cx="19" cy="18" rx="2" ry="2.2" '+eye+'/>'+
+      '<ellipse cx="29" cy="18" rx="2" ry="2.2" '+eye+'/>'+
+      '<path d="'+smile+'" stroke="#8B3A2A" stroke-width="1.5" fill="none" stroke-linecap="round"/>'+
+      '<ellipse cx="24" cy="37" rx="10" ry="8" fill="'+hr+'"/>'+
+      '<ellipse cx="24" cy="31" rx="14" ry="7" fill="'+sk+'"/>'+
+      '</svg>'
+    ));
+  }
+  return avs;
+})();
+
+var _selectedAvatar = null; /* data URI en cours de sélection dans la modale */
+
+function buildAvatarGrid(currentAvatar){
+  _selectedAvatar = currentAvatar || null;
+  var grid = document.getElementById('pl-av-grid');
+  if(!grid) return;
+  var html = '';
+  /* bouton upload */
+  html += '<div class="av-upload-btn" title="Choisir une photo" onclick="document.getElementById(\'pl-av-file\').click()">📷</div>';
+  /* presets */
+  PRESET_AVATARS.forEach(function(src,i){
+    var sel = (currentAvatar === src) ? ' sel' : '';
+    html += '<img src="'+src+'" class="'+sel+'" title="Avatar '+(i+1)+'" onclick="selectAvatar(\''+i+'\')">';
+  });
+  /* si photo custom, l'afficher en premier slot sélectionnable */
+  if(currentAvatar && PRESET_AVATARS.indexOf(currentAvatar)===-1){
+    html = '<img src="'+currentAvatar+'" class="sel" title="Ta photo" onclick="selectAvatar(\'custom\')" style="order:-1">' + html;
+  }
+  grid.innerHTML = html;
+}
+
+function selectAvatar(idx){
+  if(idx==='custom'){
+    /* déjà sélectionné, pas de changement */
+  } else {
+    _selectedAvatar = PRESET_AVATARS[parseInt(idx,10)];
+  }
+  /* mettre à jour la sélection visuelle */
+  var imgs = document.querySelectorAll('#pl-av-grid img');
+  imgs.forEach(function(img){ img.classList.remove('sel'); });
+  if(idx!=='custom'){
+    var target = document.querySelectorAll('#pl-av-grid img')[idx==='custom'?0:parseInt(idx,10)];
+    if(target) target.classList.add('sel');
+  } else {
+    var first = document.querySelector('#pl-av-grid img');
+    if(first) first.classList.add('sel');
+  }
+}
+
+function onAvatarFile(input){
+  var file = input.files[0];
+  if(!file) return;
+  if(file.size > 2*1024*1024){ toast('Photo trop lourde (max 2 Mo)'); return; }
+  var reader = new FileReader();
+  reader.onload = function(e){
+    _selectedAvatar = e.target.result;
+    buildAvatarGrid(_selectedAvatar);
+  };
+  reader.readAsDataURL(file);
+}
+
+function avatarHtml(p, size){
+  size = size || 38;
+  if(p && p.avatar){
+    return '<img src="'+esc(p.avatar)+'" class="av" style="width:'+size+'px;height:'+size+'px" alt="'+esc(p.name)+'">';
+  }
+  return '<div class="avatar" style="width:'+size+'px;height:'+size+'px;font-size:'+(size*0.38)+'px">'+esc(initial(p?p.name:'?'))+'</div>';
+}
 function openPlayerModal(id){
   editingPlayerId=id||null;
   var p=id?getPlayer(id):null;
@@ -1075,6 +1188,7 @@ function openPlayerModal(id){
   if(p&&p.refBy)sel.value=p.refBy;
   document.getElementById('pl-delete').style.display=p?'':'none';
   toggleRefField();
+  setTimeout(function(){ buildAvatarGrid(p?p.avatar:null); }, 0);
   openModal('ov-player');
 }
 function toggleRefField(){
@@ -1087,11 +1201,13 @@ function savePlayer(){
   var phone=document.getElementById('pl-phone').value.trim();
   var type=document.getElementById('pl-type').value;
   var refBy=type==='ami_ami'?document.getElementById('pl-ref').value:null;
+  var avatar=_selectedAvatar||null;
   if(editingPlayerId){
     var p=getPlayer(editingPlayerId);
     p.name=name;p.phone=phone;p.type=type;p.refBy=refBy;
+    if(avatar!==null) p.avatar=avatar;
   } else {
-    db.players.push({id:uid(),name:name,phone:phone,type:type,refBy:refBy,createdAt:Date.now()});
+    db.players.push({id:uid(),name:name,phone:phone,type:type,refBy:refBy,avatar:avatar,createdAt:Date.now()});
   }
   saveDB();closeModal('ov-player');render();
   toast(editingPlayerId?'Joueur mis à jour':'Joueur ajouté au carnet');
