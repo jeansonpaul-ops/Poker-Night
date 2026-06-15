@@ -133,7 +133,13 @@ main{max-width:980px;margin:0 auto;padding:10px 22px 80px}
 .table-center .pot-sub{font-size:13px;color:var(--text-dim)}
 .seat{position:absolute;width:56px;height:56px;margin:-28px 0 0 -28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk';font-weight:700;font-size:17px;transition:.15s}
 .seat .name-tag{position:absolute;top:100%;margin-top:5px;left:50%;transform:translateX(-50%);font-family:'Outfit';font-size:11px;font-weight:500;color:var(--text-dim);white-space:nowrap;max-width:90px;overflow:hidden;text-overflow:ellipsis}
-.seat.confirmed{background:var(--seat-color,var(--cream));color:var(--seat-text,var(--ink));box-shadow:0 3px 12px rgba(0,0,0,.5);border:3px solid rgba(255,255,255,.35)}
+/* Sièges — couleur de base, écrasée par --seat-color inline */
+.seat.confirmed{
+  background:var(--seat-color,#E8D9C4);
+  color:var(--seat-text,#1B1B17);
+  box-shadow:0 0 0 3px rgba(255,255,255,.5),0 4px 14px rgba(0,0,0,.5);
+  border:none;
+}
 .seat.pending{background:rgba(245,239,227,.10);color:var(--cream-dim);border:2px dashed rgba(245,239,227,.4)}
 .seat.free{background:transparent;border:2px dashed rgba(245,239,227,.18);color:rgba(245,239,227,.22)}
 .seat .name-tag{
@@ -629,15 +635,25 @@ function go(page,eventId){view.page=page;view.eventId=eventId||null;render();win
    RENDER
 ===================================================== */
 function render(){
-  ['dashboard','players','leaderboard'].forEach(function(p){
-    var b=document.getElementById('nav-'+p);
-    if(b) b.className = (view.page===p || (p==='dashboard'&&view.page==='event')) ? 'active' : '';
-  });
   var app=document.getElementById('app');
-  if(view.page==='players') app.innerHTML=renderPlayers();
+  if(!app) return;
+  /* animation : reset pour re-déclencher */
+  app.style.animation='none';
+  /* contenu */
+  var pages=['dashboard','players','leaderboard','stats'];
+  pages.forEach(function(p){
+    var b=document.getElementById('nav-'+p);
+    if(b) b.className=(view.page===p||(p==='dashboard'&&view.page==='event'))?'active':'';
+    var bn=document.getElementById('bnav-'+p);
+    if(bn) bn.className='bnav-btn '+((view.page===p||(p==='dashboard'&&view.page==='event'))?'active':'');
+  });
+  if(view.page==='stats')        app.innerHTML=renderStats();
+  else if(view.page==='players') app.innerHTML=renderPlayers();
   else if(view.page==='leaderboard') app.innerHTML=renderLeaderboard();
-  else if(view.page==='event') app.innerHTML=renderEventDetail();
-  else app.innerHTML=renderDashboard();
+  else if(view.page==='event')   app.innerHTML=renderEventDetail();
+  else                           app.innerHTML=renderDashboard();
+  /* re-déclencher l'animation après injection du HTML */
+  requestAnimationFrame(function(){ app.style.animation=''; });
 }
 
 /* ---------- Dashboard ---------- */
@@ -861,19 +877,17 @@ function renderSeats(ev,conf,pend){
       var isConf=inv.status==='yes';
       var cls=isConf?'confirmed':'pending';
       var _ps=inv.playerId?getPlayer(inv.playerId):null;
-      var colorStyle='';
+      var seatStyle='left:'+x+'%;top:'+y+'%;';
       if(isConf && inv.playerId!==undefined){
         var ci=colorMap[inv.playerId]!==undefined?colorMap[inv.playerId]:i;
         var col=seatColor(ci);
-        colorStyle='--seat-color:'+col.bg+';--seat-text:'+col.tx+';';
+        seatStyle+='background:'+col.bg+';color:'+col.tx+';';
       }
-      /* si avatar → image ronde, sinon initiale large */
       var seatInner=(_ps&&_ps.avatar)
         ?'<img src="'+_ps.avatar+'" class="av-seat" alt="'+esc(nm)+'">'
         :'<span style="font-size:18px;font-weight:800;letter-spacing:-.5px">'+esc(initial(nm))+'</span>';
-      /* nom complet tronqué + prénom pour la lisibilité */
       var shortName=nm.split(' ')[0];
-      html+='<div class="seat '+cls+'" style="left:'+x+'%;top:'+y+'%;'+colorStyle+'" title="'+esc(nm)+(isConf?' (confirmé)':' (en attente)')+'">'+
+      html+='<div class="seat '+cls+'" style="'+seatStyle+'" title="'+esc(nm)+(isConf?' (confirmé)':' (en attente)')+'">'+
         seatInner+'<span class="name-tag">'+esc(shortName)+'</span></div>';
     } else {
       html+='<div class="seat free" style="left:'+x+'%;top:'+y+'%" title="Place libre">+</div>';
@@ -1670,25 +1684,7 @@ applyTheme();
 /* =====================================================
    NAVIGATION — update bottom nav
 ===================================================== */
-var _origRender=render;
-render=function(){
-  _origRender();
-  updateBottomNav();
-  /* réanimer la page */
-  var app=document.getElementById('app');
-  if(app){app.style.animation='none';requestAnimationFrame(function(){app.style.animation=''});}
-};
-function updateBottomNav(){
-  var pages=['dashboard','players','leaderboard','stats'];
-  pages.forEach(function(p){
-    var b=document.getElementById('bnav-'+p);
-    if(b) b.className='bnav-btn'+(
-      (view.page===p||(p==='dashboard'&&view.page==='event'))?
-      ' active':'');
-    var nb=document.getElementById('nav-'+p);
-    if(nb) nb.className=(view.page===p||(p==='dashboard'&&view.page==='event'))?'active':'';
-  });
-}
+
 
 /* =====================================================
    PAGE STATS GLOBALES
@@ -1970,32 +1966,9 @@ function playerStats(p){
    MISE À JOUR render() pour nouvelles pages
 ===================================================== */
 /* Étendre render pour la page stats */
-var _origRender2=render;
-render=function(){
-  if(view.page==='stats'){
-    var app=document.getElementById('app');
-    if(app){
-      app.innerHTML=renderStats();
-      /* réanimer */
-      app.style.animation='none';
-      requestAnimationFrame(function(){app.style.animation='';});
-    }
-    ['dashboard','players','leaderboard'].forEach(function(p){
-      var b=document.getElementById('nav-'+p);if(b)b.className='';
-    });
-    var ns=document.getElementById('nav-stats');if(ns)ns.className='active';
-    updateBottomNav();
-  } else {
-    _origRender2();
-  }
-};
 
-/* Ajouter note + stats dans la fiche joueur */
-var _origRenderPlayers=renderPlayers;
-renderPlayers=function(){
-  var h=_origRenderPlayers();
-  return h;
-};
+
+
 
 /* =====================================================
    INJECTION NOTE + STATS dans la carte joueur

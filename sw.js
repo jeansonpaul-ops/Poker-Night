@@ -1,5 +1,5 @@
 /* Poker Night — service worker (cache-first, version simple) */
-var CACHE = 'pokernight-v1';
+var CACHE = 'pokernight-v4'; /* ← incrémenter à chaque déploiement */
 var ASSETS = ['./', './index.html', './manifest.json', './icon-192.png', './icon-512.png'];
 
 self.addEventListener('install', function (e) {
