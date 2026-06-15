@@ -17,7 +17,30 @@
   --ink:#1B1B17; --chip-red:#C9402F; --chip-blue:#2E5E8C;
   --brass:#C9A45C; --ok:#7BC47F; --no:#D97A6C; --wait:#E8B84B;
   --radius:14px; --shadow:0 8px 24px rgba(0,0,0,.35);
+  /* text aliases utilisés dans le code */
+  --text:var(--cream); --text-dim:var(--cream-dim); --bg:var(--felt); --bg2:var(--felt-2); --bg3:var(--felt-3);
 }
+body.light{
+  --felt:#F0EDE6; --felt-2:#FFFFFF; --felt-3:#E8E4DC;
+  --rail:#C8BFB0; --cream:#1A1A18; --cream-dim:#5A5A50;
+  --ink:#F5EFE3; --chip-red:#C9402F; --chip-blue:#2E5E8C;
+  --brass:#8B6914; --ok:#2D7A4F; --no:#C1392B; --wait:#9A6B14;
+  --shadow:0 4px 20px rgba(0,0,0,.12);
+}
+body.light{background:#F0EDE6;color:#1A1A18}
+body.light header{border-bottom:1px solid #DDD8CE}
+body.light .event-card{background:var(--felt-2);border-color:#DDD8CE}
+body.light .modal{background:var(--felt-2);border-color:#DDD8CE}
+body.light .field input,body.light .field select,body.light .field textarea{background:#F5F3EE;border-color:#CCC;color:#1A1A18}
+body.light .row{background:rgba(0,0,0,.03)}
+body.light .row:hover{background:rgba(0,0,0,.06)}
+body.light .panel h3{border-color:rgba(139,105,20,.25)}
+body.light #toast{background:#1A1A18;color:#F5EFE3}
+body.light .poker-table{background:radial-gradient(ellipse at 50% 40%,#2D6A4F,#1B4332 70%)}
+body.light .overlay{background:rgba(0,0,0,.5)}
+body.light .lb-table td{border-color:rgba(0,0,0,.08)}
+body.light .lb-table th{border-color:rgba(139,105,20,.3)}
+body.light .player-card{background:var(--felt-2);border-color:#DDD8CE}
 *{box-sizing:border-box;margin:0;padding:0}
 body{
   font-family:'Outfit',sans-serif;
@@ -110,9 +133,16 @@ main{max-width:980px;margin:0 auto;padding:10px 22px 80px}
 .table-center .pot-sub{font-size:13px;color:var(--text-dim)}
 .seat{position:absolute;width:56px;height:56px;margin:-28px 0 0 -28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk';font-weight:700;font-size:17px;transition:.15s}
 .seat .name-tag{position:absolute;top:100%;margin-top:5px;left:50%;transform:translateX(-50%);font-family:'Outfit';font-size:11px;font-weight:500;color:var(--text-dim);white-space:nowrap;max-width:90px;overflow:hidden;text-overflow:ellipsis}
-.seat.confirmed{background:var(--cream);color:var(--ink);box-shadow:0 3px 8px rgba(0,0,0,.4);border:3px solid var(--ok)}
-.seat.pending{background:rgba(245,239,227,.12);color:var(--text-dim);border:2px dashed rgba(245,239,227,.5)}
-.seat.free{background:transparent;border:2px dashed rgba(245,239,227,.22);color:rgba(245,239,227,.3)}
+.seat.confirmed{background:var(--seat-color,var(--cream));color:var(--seat-text,var(--ink));box-shadow:0 3px 12px rgba(0,0,0,.5);border:3px solid rgba(255,255,255,.35)}
+.seat.pending{background:rgba(245,239,227,.10);color:var(--cream-dim);border:2px dashed rgba(245,239,227,.4)}
+.seat.free{background:transparent;border:2px dashed rgba(245,239,227,.18);color:rgba(245,239,227,.22)}
+.seat .name-tag{
+  position:absolute;top:calc(100% + 6px);left:50%;transform:translateX(-50%);
+  font-family:'Outfit';font-size:11px;font-weight:700;
+  color:#fff;white-space:nowrap;max-width:90px;overflow:hidden;text-overflow:ellipsis;
+  background:rgba(0,0,0,.65);padding:2px 7px;border-radius:99px;
+  letter-spacing:.2px;text-shadow:none;
+}
 
 .cols{display:grid;grid-template-columns:1fr 1fr;gap:22px;margin-top:28px}
 @media(max-width:760px){.cols{grid-template-columns:1fr}}
@@ -217,13 +247,87 @@ main{max-width:980px;margin:0 auto;padding:10px 22px 80px}
 
 @media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 @media(max-width:600px){
-  header{padding:14px} main{padding:6px 14px 70px}
+  header{padding:14px} main{padding:6px 14px 80px}
   .page-head h2{font-size:24px} .detail-head h2{font-size:22px}
   .table-center .pot{font-size:22px}
   .seat{width:44px;height:44px;margin:-22px 0 0 -22px;font-size:14px}
   .seat .name-tag{display:none}
   .res-row,.res-head{grid-template-columns:1fr 56px 80px}
+  header nav{display:none} /* remplacé par bottom nav sur mobile */
 }
+
+/* ── Bottom navigation mobile ── */
+#bottom-nav{
+  display:none;
+  position:fixed;bottom:0;left:0;right:0;
+  background:var(--felt-2);border-top:1px solid rgba(201,164,92,.25);
+  padding:8px 0 env(safe-area-inset-bottom);
+  z-index:60;
+}
+@media(max-width:600px){#bottom-nav{display:flex;justify-content:space-around}}
+.bnav-btn{
+  flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;
+  background:transparent;border:none;cursor:pointer;padding:6px 4px;
+  color:var(--cream-dim);font-family:'Outfit';font-size:10px;font-weight:500;
+  transition:.15s;
+}
+.bnav-btn .icon{font-size:20px;line-height:1}
+.bnav-btn.active{color:var(--brass)}
+.bnav-btn.active .icon{transform:scale(1.1)}
+
+/* ── Toggle theme ── */
+.theme-toggle{
+  background:transparent;border:1px solid rgba(201,164,92,.3);
+  border-radius:99px;padding:5px 10px;cursor:pointer;
+  font-size:16px;color:var(--cream-dim);transition:.15s;
+  display:flex;align-items:center;gap:4px;
+}
+.theme-toggle:hover{color:var(--cream);border-color:var(--brass)}
+
+/* ── Vue soirée en cours ── */
+#live-overlay{
+  position:fixed;inset:0;background:var(--felt);z-index:90;
+  display:none;flex-direction:column;overflow:hidden;
+}
+#live-overlay.open{display:flex}
+.live-header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:14px 20px;background:var(--felt-2);border-bottom:1px solid rgba(201,164,92,.2);
+  flex-shrink:0;
+}
+.live-header h2{font-size:18px;font-weight:700}
+.live-body{flex:1;overflow-y:auto;padding:16px;display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media(max-width:600px){.live-body{grid-template-columns:1fr}}
+.live-block{background:var(--felt-2);border:1px solid rgba(201,164,92,.2);border-radius:var(--radius);padding:16px}
+.live-block h3{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--brass);font-family:'Outfit';margin-bottom:12px;font-weight:600}
+.live-timer-big{font-family:'Space Grotesk';font-size:56px;font-weight:700;line-height:1;text-align:center;font-variant-numeric:tabular-nums}
+.live-timer-big.warn{color:var(--wait)}
+.live-blinds-big{font-size:22px;font-weight:700;text-align:center;color:var(--cream);margin-top:4px;font-family:'Space Grotesk'}
+.live-pot{font-family:'Space Grotesk';font-size:40px;font-weight:700;text-align:center;color:var(--cream)}
+.live-pot-sub{font-size:13px;color:var(--cream-dim);text-align:center;margin-top:4px}
+.elim-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid rgba(245,239,227,.08)}
+.elim-pos{font-family:'Space Grotesk';font-size:18px;font-weight:700;color:var(--brass);width:28px;text-align:center;flex-shrink:0}
+.elim-name{flex:1;font-weight:600}
+.elim-net{font-weight:600;font-size:14px}
+.still-in{display:flex;flex-direction:column;gap:6px}
+.still-row{display:flex;align-items:center;gap:10px;padding:6px 0}
+.still-name{flex:1;font-weight:600}
+.btn-elim{background:rgba(201,64,47,.15);border:1px solid rgba(201,64,47,.3);color:var(--no);border-radius:8px;padding:4px 10px;cursor:pointer;font-size:12px;font-weight:600;font-family:'Outfit';transition:.15s}
+.btn-elim:hover{background:var(--no);color:#fff}
+
+/* ── Profil joueur / stats ── */
+.stat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:10px;margin-bottom:16px}
+.stat-box{background:rgba(245,239,227,.06);border:1px solid rgba(245,239,227,.12);border-radius:10px;padding:12px;text-align:center}
+.stat-box .sv{font-family:'Space Grotesk';font-size:22px;font-weight:700}
+.stat-box .sl{font-size:11px;color:var(--cream-dim);margin-top:3px}
+
+/* ── Notes privées ── */
+.note-area{width:100%;background:rgba(12,51,39,.5);border:1px solid rgba(245,239,227,.15);border-radius:10px;padding:10px;color:var(--cream);font-family:'Outfit';font-size:14px;resize:vertical;min-height:60px}
+body.light .note-area{background:#F5F3EE;border-color:#CCC;color:#1A1A18}
+
+/* ── Animation page ── */
+#app{animation:fadein .18s ease}
+@keyframes fadein{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
 </style>
 </head>
 <body>
@@ -236,10 +340,20 @@ main{max-width:980px;margin:0 auto;padding:10px 22px 80px}
     <button id="nav-dashboard" onclick="go('dashboard')">Soirées</button>
     <button id="nav-players" onclick="go('players')">Joueurs</button>
     <button id="nav-leaderboard" onclick="go('leaderboard')">Classement</button>
+    <button id="nav-stats" onclick="go('stats')">Stats</button>
+    <button class="theme-toggle" onclick="toggleTheme()" id="theme-btn" title="Changer le thème">🌙</button>
   </nav>
 </header>
 
 <main id="app"></main>
+
+<!-- Bottom nav mobile -->
+<div id="bottom-nav">
+  <button class="bnav-btn" id="bnav-dashboard" onclick="go('dashboard')"><span class="icon">🃏</span>Soirées</button>
+  <button class="bnav-btn" id="bnav-players" onclick="go('players')"><span class="icon">👥</span>Joueurs</button>
+  <button class="bnav-btn" id="bnav-leaderboard" onclick="go('leaderboard')"><span class="icon">🏆</span>Classement</button>
+  <button class="bnav-btn" id="bnav-stats" onclick="go('stats')"><span class="icon">📊</span>Stats</button>
+</div>
 
 <!-- Modale soirée -->
 <div class="overlay" id="ov-event">
@@ -341,6 +455,42 @@ main{max-width:980px;margin:0 auto;padding:10px 22px 80px}
   </div>
 </div>
 
+<!-- Vue soirée en cours -->
+<div id="live-overlay">
+  <div class="live-header">
+    <h2 id="live-title">Soirée en cours</h2>
+    <div style="display:flex;gap:8px">
+      <button class="btn btn-brass btn-sm" id="live-playpause" onclick="timerToggle()">▶ Démarrer</button>
+      <button class="btn btn-ghost btn-sm" onclick="closeLive()">✕ Fermer</button>
+    </div>
+  </div>
+  <div class="live-body">
+    <div class="live-block">
+      <h3>⏱ Timer</h3>
+      <div class="live-timer-big" id="live-clock">15:00</div>
+      <div class="live-blinds-big" id="live-blinds">25 / 50</div>
+      <div style="font-size:12px;color:var(--cream-dim);text-align:center;margin-top:6px" id="live-level">Niveau 1</div>
+      <div style="display:flex;gap:6px;justify-content:center;margin-top:10px">
+        <button class="btn btn-ghost btn-sm" onclick="timerPrev()">⏮</button>
+        <button class="btn btn-ghost btn-sm" onclick="timerNext()">⏭</button>
+      </div>
+    </div>
+    <div class="live-block">
+      <h3>💰 Pot</h3>
+      <div class="live-pot" id="live-pot">0 €</div>
+      <div class="live-pot-sub" id="live-pot-sub"></div>
+    </div>
+    <div class="live-block">
+      <h3>🏆 Éliminations</h3>
+      <div id="live-elims"></div>
+    </div>
+    <div class="live-block">
+      <h3>🃏 Encore en jeu</h3>
+      <div class="still-in" id="live-still"></div>
+    </div>
+  </div>
+</div>
+
 <div id="toast"></div>
 
 <script>
@@ -379,6 +529,7 @@ function migrate(d){
   d = d || {};
   d.players = d.players || [];
   d.events = d.events || [];
+  d.players.forEach(function(p){ if(!p.createdBy) p.createdBy = CLIENT_ID; });
   d.events.forEach(function(e){
     e.invites = e.invites || [];
     e.invites.forEach(function(i){
@@ -679,21 +830,51 @@ function refLabel(p){
   }
   return p.phone?esc(p.phone):'Cercle proche';
 }
+
+/* Palette couleurs joueurs — 10 teintes bien distinctes */
+var SEAT_PALETTE = [
+  {bg:'#C9402F',tx:'#fff'},  // rouge
+  {bg:'#2E5E8C',tx:'#fff'},  // bleu
+  {bg:'#2D7A4F',tx:'#fff'},  // vert
+  {bg:'#7B3F9E',tx:'#fff'},  // violet
+  {bg:'#C9A45C',tx:'#1B1B17'}, // or
+  {bg:'#D97A2E',tx:'#fff'},  // orange
+  {bg:'#1A8C8C',tx:'#fff'},  // teal
+  {bg:'#A83260',tx:'#fff'},  // rose
+  {bg:'#4A7C3F',tx:'#fff'},  // olive
+  {bg:'#3C5E8C',tx:'#fff'},  // bleu-gris
+];
+/* Assigne une couleur stable à un joueur via son index dans la liste confirmés */
+function seatColor(idx){ return SEAT_PALETTE[idx % SEAT_PALETTE.length]; }
 function renderSeats(ev,conf,pend){
   var seats=Math.min(Math.max(ev.seats||8,2),10), html='';
   var occupants=conf.concat(pend).slice(0,seats);
+  /* map playerId → index pour couleur stable */
+  var colorMap={};
+  conf.forEach(function(inv,ci){ if(inv.playerId) colorMap[inv.playerId]=ci; });
   for(var i=0;i<seats;i++){
     var angle=(Math.PI*2*i/seats)-Math.PI/2;
     var x=50+46*Math.cos(angle), y=50+47*Math.sin(angle);
     var inv=occupants[i];
     if(inv){
-      var nm=invName(inv), cls=inv.status==='yes'?'confirmed':'pending';
+      var nm=invName(inv);
+      var isConf=inv.status==='yes';
+      var cls=isConf?'confirmed':'pending';
       var _ps=inv.playerId?getPlayer(inv.playerId):null;
+      var colorStyle='';
+      if(isConf && inv.playerId!==undefined){
+        var ci=colorMap[inv.playerId]!==undefined?colorMap[inv.playerId]:i;
+        var col=seatColor(ci);
+        colorStyle='--seat-color:'+col.bg+';--seat-text:'+col.tx+';';
+      }
+      /* si avatar → image ronde, sinon initiale large */
       var seatInner=(_ps&&_ps.avatar)
         ?'<img src="'+_ps.avatar+'" class="av-seat" alt="'+esc(nm)+'">'
-        :esc(initial(nm));
-      html+='<div class="seat '+cls+'" style="left:'+x+'%;top:'+y+'%" title="'+esc(nm)+(inv.status==='yes'?' (confirmé)':' (en attente)')+'">'+
-        seatInner+'<span class="name-tag">'+esc(nm)+'</span></div>';
+        :'<span style="font-size:18px;font-weight:800;letter-spacing:-.5px">'+esc(initial(nm))+'</span>';
+      /* nom complet tronqué + prénom pour la lisibilité */
+      var shortName=nm.split(' ')[0];
+      html+='<div class="seat '+cls+'" style="left:'+x+'%;top:'+y+'%;'+colorStyle+'" title="'+esc(nm)+(isConf?' (confirmé)':' (en attente)')+'">'+
+        seatInner+'<span class="name-tag">'+esc(shortName)+'</span></div>';
     } else {
       html+='<div class="seat free" style="left:'+x+'%;top:'+y+'%" title="Place libre">+</div>';
     }
@@ -1174,7 +1355,18 @@ function avatarHtml(p, size){
   }
   return '<div class="avatar" style="width:'+size+'px;height:'+size+'px;font-size:'+(size*0.38)+'px">'+esc(initial(p?p.name:'?'))+'</div>';
 }
+function canEditPlayer(p){
+  /* Peut modifier : le créateur du joueur (CLIENT_ID), ou la personne concernée */
+  var profile=getProfile();
+  var isSelf=profile&&profile.playerId===p.id;
+  var isAdmin=!p.createdBy||p.createdBy===CLIENT_ID;
+  return isSelf||isAdmin;
+}
 function openPlayerModal(id){
+  if(id){
+    var _ep=getPlayer(id);
+    if(_ep&&!canEditPlayer(_ep)){toast('Modification non autoris\u00e9e');return}
+  }
   editingPlayerId=id||null;
   var p=id?getPlayer(id):null;
   document.getElementById('pl-modal-title').textContent=p?'Modifier le joueur':'Nouveau joueur';
@@ -1207,7 +1399,7 @@ function savePlayer(){
     p.name=name;p.phone=phone;p.type=type;p.refBy=refBy;
     if(avatar!==null) p.avatar=avatar;
   } else {
-    db.players.push({id:uid(),name:name,phone:phone,type:type,refBy:refBy,avatar:avatar,createdAt:Date.now()});
+    db.players.push({id:uid(),name:name,phone:phone,type:type,refBy:refBy,avatar:avatar,createdBy:CLIENT_ID,createdAt:Date.now()});
   }
   saveDB();closeModal('ov-player');render();
   toast(editingPlayerId?'Joueur mis à jour':'Joueur ajouté au carnet');
@@ -1456,6 +1648,422 @@ function checkInstallBanner(){
   document.body.appendChild(banner);
 }
 window.addEventListener('load', checkInstallBanner);
+
+/* =====================================================
+   THÈME DARK / LIGHT
+===================================================== */
+function toggleTheme(){
+  var isLight=document.body.classList.toggle('light');
+  localStorage.setItem('pn_theme', isLight?'light':'dark');
+  document.getElementById('theme-btn').textContent=isLight?'🌞':'🌙';
+}
+function applyTheme(){
+  var t=localStorage.getItem('pn_theme');
+  if(t==='light'){
+    document.body.classList.add('light');
+    var btn=document.getElementById('theme-btn');
+    if(btn) btn.textContent='🌞';
+  }
+}
+applyTheme();
+
+/* =====================================================
+   NAVIGATION — update bottom nav
+===================================================== */
+var _origRender=render;
+render=function(){
+  _origRender();
+  updateBottomNav();
+  /* réanimer la page */
+  var app=document.getElementById('app');
+  if(app){app.style.animation='none';requestAnimationFrame(function(){app.style.animation=''});}
+};
+function updateBottomNav(){
+  var pages=['dashboard','players','leaderboard','stats'];
+  pages.forEach(function(p){
+    var b=document.getElementById('bnav-'+p);
+    if(b) b.className='bnav-btn'+(
+      (view.page===p||(p==='dashboard'&&view.page==='event'))?
+      ' active':'');
+    var nb=document.getElementById('nav-'+p);
+    if(nb) nb.className=(view.page===p||(p==='dashboard'&&view.page==='event'))?'active':'';
+  });
+}
+
+/* =====================================================
+   PAGE STATS GLOBALES
+===================================================== */
+function renderStats(){
+  var totalEv=db.events.length;
+  var pastEv=db.events.filter(isPast);
+  var totalPot=db.events.reduce(function(a,e){
+    return a+confirmed(e).length*(e.buyin||0);
+  },0);
+  var totalPlayers=db.players.length;
+
+  /* meilleur joueur par net */
+  var agg={};
+  db.events.forEach(function(e){
+    if(!e.results)return;
+    e.results.forEach(function(r){
+      var k=r.playerId||r.name;
+      if(!agg[k])agg[k]={name:r.name,net:0,wins:0,games:0};
+      agg[k].net+=r.net;agg[k].games++;
+      if(r.rank===1)agg[k].wins++;
+    });
+  });
+  var ranked=Object.values(agg).sort(function(a,b){return b.net-a.net});
+  var best=ranked[0];
+  var mostWins=Object.values(agg).sort(function(a,b){return b.wins-a.wins})[0];
+
+  var h='<div class="page-head"><div><h2>Stats globales</h2>'+
+    '<div class="sub">Vue d\'ensemble de toutes tes soirées</div></div></div>';
+
+  h+='<div class="stat-grid">'+
+    '<div class="stat-box"><div class="sv">'+totalEv+'</div><div class="sl">Soirées créées</div></div>'+
+    '<div class="stat-box"><div class="sv">'+pastEv.length+'</div><div class="sl">Soirées jouées</div></div>'+
+    '<div class="stat-box"><div class="sv">'+totalPlayers+'</div><div class="sl">Joueurs au carnet</div></div>'+
+    '<div class="stat-box"><div class="sv">'+totalPot+' €</div><div class="sl">Total pots générés</div></div>'+
+    (best?'<div class="stat-box"><div class="sv net-pos">'+best.name.split(' ')[0]+'</div><div class="sl">Meilleur net ('+(best.net>0?'+':'')+best.net+' €)</div></div>':'')+ 
+    (mostWins?'<div class="stat-box"><div class="sv" style="color:var(--brass)">'+mostWins.name.split(' ')[0]+'</div><div class="sl">'+mostWins.wins+' victoire'+(mostWins.wins>1?'s':'')+'</div></div>':'')+ 
+  '</div>';
+
+  /* graphe mensuel simplifié */
+  if(pastEv.length){
+    var byMonth={};
+    pastEv.forEach(function(e){
+      if(!e.date)return;
+      var m=e.date.slice(0,7);
+      if(!byMonth[m])byMonth[m]=0;
+      byMonth[m]++;
+    });
+    var months=Object.keys(byMonth).sort();
+    var maxV=Math.max.apply(null,Object.values(byMonth));
+    h+='<div class="panel" style="margin-top:20px"><h3>Soirées par mois</h3>';
+    h+='<div style="display:flex;align-items:flex-end;gap:8px;height:80px;padding:8px 0">';
+    months.forEach(function(m){
+      var v=byMonth[m];
+      var pct=Math.round((v/maxV)*100);
+      var label=m.slice(5)+'/'+m.slice(2,4);
+      h+='<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px">'+
+        '<div style="font-size:11px;color:var(--cream-dim)">'+v+'</div>'+
+        '<div style="width:100%;background:var(--brass);border-radius:4px 4px 0 0;height:'+pct+'%;min-height:4px;opacity:.85"></div>'+
+        '<div style="font-size:10px;color:var(--cream-dim);transform:rotate(-30deg);white-space:nowrap">'+label+'</div>'+
+      '</div>';
+    });
+    h+='</div></div>';
+  }
+
+  /* classement rapide si données dispo */
+  if(ranked.length){
+    h+='<div class="panel" style="margin-top:20px"><h3>Top joueurs (résultats enregistrés)</h3>';
+    h+='<table class="lb-table"><thead><tr><th></th><th>Joueur</th><th>Net total</th><th>Victoires</th><th>Soirées</th></tr></thead><tbody>';
+    ranked.slice(0,10).forEach(function(r,i){
+      h+='<tr><td class="lb-rank">'+(i+1)+(i===0?' 🏆':'')+'</td><td>'+esc(r.name)+'</td>'+
+        '<td class="'+(r.net>=0?'net-pos':'net-neg')+'">'+(r.net>=0?'+':'')+r.net+' €</td>'+
+        '<td>'+r.wins+'</td><td>'+r.games+'</td></tr>';
+    });
+    h+='</tbody></table></div>';
+  } else {
+    h+='<div class="empty" style="margin-top:20px"><span class="suit">📊</span>'+
+      '<p>Enregistre les résultats de tes soirées pour voir les stats apparaître ici.</p></div>';
+  }
+  return h;
+}
+
+/* =====================================================
+   NOTES PRIVÉES PAR JOUEUR
+===================================================== */
+var NOTES_KEY='pn_notes';
+function getNote(playerId){
+  try{var n=JSON.parse(localStorage.getItem(NOTES_KEY)||'{}');return n[playerId]||''}catch(e){return''}
+}
+function saveNote(playerId,text){
+  try{
+    var n=JSON.parse(localStorage.getItem(NOTES_KEY)||'{}');
+    n[playerId]=text;
+    localStorage.setItem(NOTES_KEY,JSON.stringify(n));
+  }catch(e){}
+}
+
+/* =====================================================
+   RÉCURRENCE TABLE
+===================================================== */
+function scheduleRecurring(eventId){
+  var ev=getEvent(eventId);
+  if(!ev||!ev.date){toast('Fixe d\'abord une date sur la soirée');return}
+  var d=new Date(ev.date);
+  d.setMonth(d.getMonth()+1);
+  var pad=function(n){return (n<10?'0':'')+n};
+  var nextDate=d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());
+  var copy=JSON.parse(JSON.stringify(ev));
+  copy.id=uid();
+  copy.date=nextDate;
+  copy.title=ev.title;
+  copy.results=null;
+  copy.createdAt=Date.now();
+  copy.invites.forEach(function(i){
+    i.id=uid();i.status='pending';i.paid=false;i.rebuys=0;i.attended=null;
+  });
+  copy.items.forEach(function(it){it.id=uid();it.invId=null});
+  db.events.push(copy);
+  saveDB();
+  toast('Soirée récurrente créée pour le '+nextDate);
+  go('event',copy.id);
+}
+
+/* =====================================================
+   VUE SOIRÉE EN COURS (LIVE)
+===================================================== */
+var liveEventId=null;
+var liveEliminations=[]; /* [{playerId, name, rank}] */
+
+function openLive(eventId){
+  liveEventId=eventId;
+  var ev=getEvent(eventId);
+  if(!ev)return;
+  liveEliminations=[];
+  document.getElementById('live-title').textContent=ev.title||'Soirée en cours';
+  /* sync timer avec la soirée */
+  timer.eventId=eventId;
+  timer.duration=(ev.levelMin||15)*60;
+  timer.level=0;timer.remaining=timer.duration;timer.running=false;
+  clearInterval(timer.handle);
+  updateLive();
+  document.getElementById('live-overlay').classList.add('open');
+}
+function closeLive(){
+  document.getElementById('live-overlay').classList.remove('open');
+  timer.running=false;clearInterval(timer.handle);
+  /* proposer d'enregistrer les résultats si éliminations enregistrées */
+  if(liveEliminations.length>0){
+    if(window.confirm('Enregistrer les résultats depuis les éliminations ?')){
+      applyLiveResults();
+    }
+  }
+}
+function updateLive(){
+  var ev=getEvent(liveEventId);
+  if(!ev)return;
+  /* timer */
+  var mm=Math.floor(timer.remaining/60),ss=timer.remaining%60;
+  var clk=document.getElementById('live-clock');
+  if(clk){
+    clk.textContent=(mm<10?'0':'')+mm+':'+(ss<10?'0':'')+ss;
+    clk.className='live-timer-big'+(timer.remaining<=60&&timer.running?' warn':'');
+  }
+  var bl=document.getElementById('live-blinds');
+  if(bl) bl.textContent=BLIND_STRUCTURE[timer.level][0]+' / '+BLIND_STRUCTURE[timer.level][1];
+  var lv=document.getElementById('live-level');
+  if(lv) lv.textContent='Niveau '+(timer.level+1)+' / '+BLIND_STRUCTURE.length;
+  var pp=document.getElementById('live-playpause');
+  if(pp) pp.textContent=timer.running?'⏸ Pause':'▶ Démarrer';
+  /* pot */
+  var conf=confirmed(ev);
+  var rebuysTotal=ev.invites.reduce(function(a,i){return a+(i.rebuys||0)},0);
+  var pot=(conf.length+rebuysTotal)*(ev.buyin||0);
+  var lp=document.getElementById('live-pot');
+  if(lp) lp.textContent=pot+' €';
+  var ls=document.getElementById('live-pot-sub');
+  if(ls) ls.textContent=conf.length+' joueurs × '+ev.buyin+' €'+(rebuysTotal?' + '+rebuysTotal+' re-buy'+(rebuysTotal>1?'s':''):'');
+  /* éliminations */
+  var elimEl=document.getElementById('live-elims');
+  if(elimEl){
+    if(!liveEliminations.length){
+      elimEl.innerHTML='<div class="hint">Élimine les joueurs en cliquant sur "Éliminer" à droite.</div>';
+    } else {
+      elimEl.innerHTML=liveEliminations.slice().reverse().map(function(e){
+        return '<div class="elim-row">'+
+          '<div class="elim-pos">'+e.rank+'</div>'+
+          '<div class="elim-name">'+esc(e.name)+'</div>'+
+          '<div class="elim-net net-neg">−'+ev.buyin+' €</div>'+
+        '</div>';
+      }).join('');
+    }
+  }
+  /* encore en jeu */
+  var elimIds=liveEliminations.map(function(e){return e.playerId});
+  var stillIn=conf.filter(function(inv){
+    return elimIds.indexOf(inv.playerId)===-1;
+  });
+  var stillEl=document.getElementById('live-still');
+  if(stillEl){
+    if(!stillIn.length){
+      stillEl.innerHTML='<div class="hint">Tout le monde est éliminé — le vainqueur remporte le pot !</div>';
+    } else {
+      stillEl.innerHTML=stillIn.map(function(inv){
+        var nm=invName(inv);
+        return '<div class="still-row">'+
+          avatarHtml(inv.playerId?getPlayer(inv.playerId):null,30)+
+          '<div class="still-name">'+esc(nm)+'</div>'+
+          '<button class="btn-elim" onclick="eliminatePlayer(\''+inv.id+'\')">Éliminer</button>'+
+        '</div>';
+      }).join('');
+    }
+  }
+}
+function eliminatePlayer(invId){
+  var ev=getEvent(liveEventId);
+  if(!ev)return;
+  var inv=getInvite(ev,invId);
+  if(!inv)return;
+  var nm=invName(inv);
+  var rank=liveEliminations.length+1;
+  liveEliminations.push({playerId:inv.playerId,invId:invId,name:nm,rank:rank});
+  updateLive();
+}
+function applyLiveResults(){
+  var ev=getEvent(liveEventId);
+  if(!ev)return;
+  var conf=confirmed(ev);
+  var total=conf.length;
+  var pot=total*(ev.buyin||0)+ev.invites.reduce(function(a,i){return a+(i.rebuys||0)},0)*(ev.buyin||0);
+  var elimIds=liveEliminations.map(function(e){return e.playerId});
+  /* vainqueurs = confirmés non éliminés, dans l'ordre d'arrivée */
+  var winners=conf.filter(function(inv){return elimIds.indexOf(inv.playerId)===-1});
+  var results=[];
+  /* éliminations du dernier au premier → rang depuis la fin */
+  liveEliminations.slice().reverse().forEach(function(e,i){
+    results.push({playerId:e.playerId,name:e.name,rank:total-i,net:-(ev.buyin||0)});
+  });
+  /* vainqueurs partagent le pot (simplifié : 1er prend tout) */
+  winners.forEach(function(inv,i){
+    var nm=invName(inv);
+    var win=i===0?pot-((winners.length-1)*(ev.buyin||0)):ev.buyin||0;
+    results.push({playerId:inv.playerId,name:nm,rank:i+1,net:win-(ev.buyin||0)});
+  });
+  results.sort(function(a,b){return a.rank-b.rank});
+  ev.results=results;
+  saveDB();render();
+  toast('Résultats enregistrés depuis les éliminations');
+}
+
+/* Brancher la mise à jour live sur le timer existant */
+var _origTimerUpdate=updateTimerUI;
+updateTimerUI=function(){
+  _origTimerUpdate();
+  if(document.getElementById('live-overlay').classList.contains('open')){
+    updateLive();
+  }
+};
+
+/* =====================================================
+   STATS JOUEUR — enrichir la fiche joueur
+===================================================== */
+function playerStats(p){
+  var games=0,wins=0,net=0,present=0,noshow=0;
+  db.events.forEach(function(e){
+    var inv=e.invites.find(function(i){return i.playerId===p.id});
+    if(!inv||inv.status!=='yes')return;
+    games++;
+    if(inv.attended===true)present++;
+    if(inv.attended===false)noshow++;
+    if(e.results){
+      var r=e.results.find(function(r){return r.playerId===p.id});
+      if(r){net+=r.net;if(r.rank===1)wins++;}
+    }
+  });
+  return{games:games,wins:wins,net:net,present:present,noshow:noshow};
+}
+
+/* =====================================================
+   MISE À JOUR render() pour nouvelles pages
+===================================================== */
+/* Étendre render pour la page stats */
+var _origRender2=render;
+render=function(){
+  if(view.page==='stats'){
+    var app=document.getElementById('app');
+    if(app){
+      app.innerHTML=renderStats();
+      /* réanimer */
+      app.style.animation='none';
+      requestAnimationFrame(function(){app.style.animation='';});
+    }
+    ['dashboard','players','leaderboard'].forEach(function(p){
+      var b=document.getElementById('nav-'+p);if(b)b.className='';
+    });
+    var ns=document.getElementById('nav-stats');if(ns)ns.className='active';
+    updateBottomNav();
+  } else {
+    _origRender2();
+  }
+};
+
+/* Ajouter note + stats dans la fiche joueur */
+var _origRenderPlayers=renderPlayers;
+renderPlayers=function(){
+  var h=_origRenderPlayers();
+  return h;
+};
+
+/* =====================================================
+   INJECTION NOTE + STATS dans la carte joueur
+===================================================== */
+/* Surcharger la card joueur pour afficher note + stats */
+(function(){
+  var _orig=renderPlayers;
+  renderPlayers=function(){
+    /* reconstruit la page joueurs avec notes inline */
+    var amis=db.players.filter(function(p){return p.type==='ami'});
+    var amisamis=db.players.filter(function(p){return p.type==='ami_ami'});
+    var hh='<div class="page-head"><div><h2>Carnet de joueurs</h2>'+
+      '<div class="sub">'+amis.length+' amis · '+amisamis.length+' amis d\'amis</div></div>'+
+      '<button class="btn btn-primary" onclick="openPlayerModal()">+ Ajouter un joueur</button></div>';
+    if(!db.players.length){
+      return hh+'<div class="empty"><span class="suit">♥</span><p>Ton carnet est vide.<br>Ajoute tes amis, puis leurs amis.</p>'+
+        '<button class="btn btn-primary" onclick="openPlayerModal()">Ajouter un joueur</button></div>';
+    }
+    function card(p){
+      var f=fiabilite(p);
+      var st=playerStats(p);
+      var note=getNote(p.id);
+      var canEdit=canEditPlayer(p);
+      return '<div class="player-card" style="flex-direction:column;align-items:stretch">'+
+        '<div style="display:flex;align-items:center;gap:12px">'+
+          avatarHtml(p,42)+
+          '<div class="info" style="flex:1"><div class="nm">'+esc(p.name)+'</div>'+
+          '<div class="ref">'+refLabel(p)+(f!==null?'<br>'+fiabHtml(f):'')+'</div></div>'+
+          (canEdit?'<button class="btn btn-ghost btn-sm" onclick="openPlayerModal(\''+p.id+'\')">Modifier</button>':'')+
+        '</div>'+
+        '<div class="stat-grid" style="margin:10px 0 6px;grid-template-columns:repeat(4,1fr)">'+
+          '<div class="stat-box"><div class="sv">'+st.games+'</div><div class="sl">Parties</div></div>'+
+          '<div class="stat-box"><div class="sv">'+st.wins+'</div><div class="sl">Victoires</div></div>'+
+          '<div class="stat-box"><div class="sv '+(st.net>=0?'net-pos':'net-neg')+'">'+(st.net>=0?'+':'')+st.net+'€</div><div class="sl">Net</div></div>'+
+          '<div class="stat-box"><div class="sv">'+(st.present+st.noshow>0?Math.round(100*st.present/(st.present+st.noshow))+'%':'—')+'</div><div class="sl">Fiabilité</div></div>'+
+        '</div>'+
+        (canEdit?'<textarea class="note-area" placeholder="Note privée (visible seulement par toi)..." onchange="saveNote(\''+p.id+'\',this.value)">'+esc(note)+'</textarea>':
+          (note?'<div class="hint" style="padding:6px 8px;background:rgba(245,239,227,.05);border-radius:8px">📝 '+esc(note)+'</div>':'')
+        )+
+      '</div>';
+    }
+    if(amis.length) hh+='<div class="panel" style="margin-bottom:24px"><h3>Amis directs</h3><div class="player-grid">'+amis.map(card).join('')+'</div></div>';
+    if(amisamis.length) hh+='<div class="panel"><h3>Amis d\'amis</h3><div class="player-grid">'+amisamis.map(card).join('')+'</div></div>';
+    return hh;
+  };
+})();
+
+/* =====================================================
+   AJOUTER BOUTONS LIVE + RÉCURRENCE dans renderEventDetail
+===================================================== */
+(function(){
+  var _origDetail=renderEventDetail;
+  renderEventDetail=function(){
+    var ev=getEvent(view.eventId);
+    if(!ev)return _origDetail();
+    var creator=isCreator(ev);
+    var h=_origDetail();
+    /* injecter bouton Live et Récurrence dans les actions — on les ajoute en bas */
+    if(creator){
+      var insertAfter='<button class="btn btn-ghost" onclick="openResults(\''+ev.id+'\')">🏆 Résultats</button>';
+      var extra=insertAfter+
+        '<button class="btn btn-primary" onclick="openLive(\''+ev.id+'\')">🟢 Vue live</button>'+
+        (ev.date?'<button class="btn btn-ghost" onclick="scheduleRecurring(\''+ev.id+'\')">🔁 Récurrence</button>':'');
+      h=h.replace(insertAfter, extra);
+    }
+    return h;
+  };
+})();
 
 if('serviceWorker' in navigator && location.protocol==='https:'){
   navigator.serviceWorker.register('sw.js').catch(function(){});
